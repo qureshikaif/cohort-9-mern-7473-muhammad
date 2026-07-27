@@ -33,7 +33,7 @@ Health check: <http://localhost:5000/api/health>
 
 ## Folder structure
 
-```
+```text
 prisma/            Prisma schema (client generates to src/generated/prisma)
 test/              Mocha specs (*.spec.ts)
 src/
