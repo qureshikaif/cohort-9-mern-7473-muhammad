@@ -1,26 +1,42 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
-const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().positive().max(65535).default(5000),
-  CLIENT_URL: z.string().url().default('http://localhost:5173'),
-
-  // PrismaPg needs a direct postgres connection string, so reject other schemes
-  // (e.g. prisma+postgres://) here instead of failing when the pool is created.
-  DATABASE_URL: z
+// Both signing keys share the same rules: long enough to resist brute force, and
+// not left as the placeholder copied out of .env.example.
+const jwtSecret = (name: string) =>
+  z
     .string()
-    .min(1, 'DATABASE_URL is required')
+    .min(32, `${name} must be at least 32 characters`)
     .refine(
-      (url) => /^postgres(ql)?:\/\//i.test(url),
-      'DATABASE_URL must be a postgres:// or postgresql:// connection string'
-    ),
+      (value) => !/^replace-me/i.test(value),
+      `${name} must be replaced with a real secret (see .env.example)`
+    );
 
-  JWT_ACCESS_SECRET: z.string().min(1, 'JWT_ACCESS_SECRET is required'),
-  JWT_REFRESH_SECRET: z.string().min(1, 'JWT_REFRESH_SECRET is required'),
-  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
-});
+const envSchema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    PORT: z.coerce.number().int().positive().max(65535).default(5000),
+    CLIENT_URL: z.string().url().default('http://localhost:5173'),
+
+    // PrismaPg needs a direct postgres connection string, so reject other schemes
+    // (e.g. prisma+postgres://) here instead of failing when the pool is created.
+    DATABASE_URL: z
+      .string()
+      .min(1, 'DATABASE_URL is required')
+      .refine(
+        (url) => /^postgres(ql)?:\/\//i.test(url),
+        'DATABASE_URL must be a postgres:// or postgresql:// connection string'
+      ),
+
+    JWT_ACCESS_SECRET: jwtSecret('JWT_ACCESS_SECRET'),
+    JWT_REFRESH_SECRET: jwtSecret('JWT_REFRESH_SECRET'),
+    JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+    JWT_REFRESH_EXPIRES_IN: z.string().default('7d'),
+  })
+  .refine((config) => config.JWT_ACCESS_SECRET !== config.JWT_REFRESH_SECRET, {
+    message: 'JWT_ACCESS_SECRET and JWT_REFRESH_SECRET must be different',
+    path: ['JWT_REFRESH_SECRET'],
+  });
 
 const parsed = envSchema.safeParse(process.env);
 
