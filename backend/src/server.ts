@@ -9,25 +9,32 @@ import { logger } from './utils/logger.js';
 async function bootstrap(): Promise<void> {
   await connectDatabase();
 
-  const app = createApp();
-  const httpServer = createServer(app);
+  // Anything after this point owns an open connection pool, so release it before
+  // letting a startup failure propagate.
+  try {
+    const app = createApp();
+    const httpServer = createServer(app);
 
-  initSocket(httpServer);
+    initSocket(httpServer);
 
-  httpServer.listen(env.PORT, () => {
-    logger.info(`Server listening on http://localhost:${env.PORT} [${env.NODE_ENV}]`);
-  });
-
-  const shutdown = async (signal: string): Promise<void> => {
-    logger.info(`${signal} received, shutting down...`);
-    httpServer.close(async () => {
-      await disconnectDatabase();
-      process.exit(0);
+    httpServer.listen(env.PORT, () => {
+      logger.info(`Server listening on http://localhost:${env.PORT} [${env.NODE_ENV}]`);
     });
-  };
 
-  process.on('SIGINT', () => void shutdown('SIGINT'));
-  process.on('SIGTERM', () => void shutdown('SIGTERM'));
+    const shutdown = async (signal: string): Promise<void> => {
+      logger.info(`${signal} received, shutting down...`);
+      httpServer.close(async () => {
+        await disconnectDatabase();
+        process.exit(0);
+      });
+    };
+
+    process.on('SIGINT', () => void shutdown('SIGINT'));
+    process.on('SIGTERM', () => void shutdown('SIGTERM'));
+  } catch (error) {
+    await disconnectDatabase();
+    throw error;
+  }
 }
 
 bootstrap().catch((err) => {

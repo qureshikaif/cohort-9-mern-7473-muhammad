@@ -26,14 +26,18 @@ export function errorHandler(
     message = err.message;
   }
 
-  if (statusCode >= 500) {
+  const isServerError = statusCode >= 500;
+
+  if (isServerError) {
     logger.error({ err }, message);
   }
 
+  // 5xx messages can carry driver or library internals, so log them but never
+  // send them to the client.
   res.status(statusCode).json({
     success: false,
-    message,
-    ...(details ? { details } : {}),
+    message: isServerError ? 'Internal Server Error' : message,
+    ...(!isServerError && details ? { details } : {}),
     ...(isProd ? {} : { stack: err instanceof Error ? err.stack : undefined }),
   });
 }

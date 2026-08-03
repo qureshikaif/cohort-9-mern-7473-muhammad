@@ -2,19 +2,20 @@ import type { Request, Response } from 'express';
 import { prisma } from '../config/prisma.js';
 
 export async function getHealth(_req: Request, res: Response): Promise<void> {
-  let database: string;
+  let healthy: boolean;
   try {
     await prisma.$queryRaw`SELECT 1`;
-    database = 'connected';
+    healthy = true;
   } catch {
-    database = 'disconnected';
+    healthy = false;
   }
 
-  res.status(200).json({
-    success: true,
-    status: 'ok',
+  // 503 so load balancers take this instance out of rotation when the database is gone.
+  res.status(healthy ? 200 : 503).json({
+    success: healthy,
+    status: healthy ? 'ok' : 'unhealthy',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
-    database,
+    database: healthy ? 'connected' : 'disconnected',
   });
 }

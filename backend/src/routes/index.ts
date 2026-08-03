@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import healthRoutes from './health.routes.js';
 
 const router = Router();
 
-router.use('/health', healthRoutes);
+// Feature routers are mounted here as they land. /api/health is registered
+// directly in app.ts so probes bypass the rate limiter.
 
 export default router;
