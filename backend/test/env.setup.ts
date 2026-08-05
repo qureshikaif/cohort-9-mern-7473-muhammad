@@ -1,0 +1,6 @@
+// Loaded before the specs so src/config/env.ts sees a valid environment and does
+// not exit the process. Values are throwaway and never touch a real database.
+process.env.NODE_ENV ??= 'test';
+process.env.DATABASE_URL ??= 'postgresql://test:test@127.0.0.1:5432/test';
+process.env.JWT_ACCESS_SECRET ??= 'test-access-secret-not-for-real-use-01';
+process.env.JWT_REFRESH_SECRET ??= 'test-refresh-secret-not-for-real-use-1';
