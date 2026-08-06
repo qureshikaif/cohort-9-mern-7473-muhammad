@@ -1,4 +1,4 @@
-import type { Session } from './types';
+import type { Note, NoteList, Session } from './types';
 
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api';
 
@@ -139,4 +139,31 @@ export async function logout(): Promise<void> {
   } finally {
     writeSession(null);
   }
+}
+
+export function listNotes(search: string): Promise<NoteList> {
+  const query = search.trim() ? `?search=${encodeURIComponent(search.trim())}` : '';
+  return authed<NoteList>(`/notes${query}`);
+}
+
+export function getNote(id: string): Promise<{ note: Note }> {
+  return authed<{ note: Note }>(`/notes/${id}`);
+}
+
+export function createNote(title: string, content: string): Promise<{ note: Note }> {
+  return authed<{ note: Note }>('/notes', {
+    method: 'POST',
+    body: JSON.stringify({ title, content }),
+  });
+}
+
+export function updateNote(id: string, title: string, content: string): Promise<{ note: Note }> {
+  return authed<{ note: Note }>(`/notes/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ title, content }),
+  });
+}
+
+export function deleteNote(id: string): Promise<void> {
+  return authed<void>(`/notes/${id}`, { method: 'DELETE' });
 }
