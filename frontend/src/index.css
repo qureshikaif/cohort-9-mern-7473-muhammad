@@ -1,111 +1,214 @@
+@import 'tailwindcss';
+
+/* Semantic tokens live as plain variables so the dark scheme can swap them,
+   then @theme inline maps them to Tailwind utilities that follow the swap. */
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --paper: #fbf7ef;
+  --sheet: #fffdf8;
+  --ink: #262320;
+  --ink-soft: #6b6459;
+  --ink-faint: #a89e8f;
+  --edge: #e6dcc9;
+  --rule: #d9e3ef;
+  --margin-line: #e2a9a0;
+  --accent: #b4573f;
+  --accent-soft: #f3e2dc;
+  --danger: #a8342b;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
   color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+    --paper: #14161a;
+    --sheet: #1c1f25;
+    --ink: #e9e4d9;
+    --ink-soft: #a29c90;
+    --ink-faint: #6d6862;
+    --edge: #2a2e36;
+    --rule: #2b323d;
+    --margin-line: #7d4a44;
+    --accent: #e08163;
+    --accent-soft: #2e2320;
+    --danger: #e2726a;
   }
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+@theme inline {
+  --color-paper: var(--paper);
+  --color-sheet: var(--sheet);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-edge: var(--edge);
+  --color-rule: var(--rule);
+  --color-margin-line: var(--margin-line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-danger: var(--danger);
+
+  --font-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
+  --ease-paper: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  --animate-page-in: page-in 420ms var(--ease-paper) both;
+  --animate-sheet-in: sheet-in 520ms var(--ease-paper) both;
+  --animate-card-in: card-in 420ms var(--ease-paper) both;
+  --animate-nudge: nudge 380ms var(--ease-paper);
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-sway: sway 9s ease-in-out infinite;
+  --animate-draw: draw 2.4s var(--ease-paper) 500ms forwards;
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) rotate(-1deg);
+    }
+  }
+
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) rotate(1deg);
+    }
+  }
+
+  @keyframes nudge {
+    20% {
+      transform: translateX(-5px);
+    }
+    50% {
+      transform: translateX(4px);
+    }
+    80% {
+      transform: translateX(-2px);
+    }
+  }
+
+  @keyframes float {
+    50% {
+      transform: translateY(-9px);
+    }
+  }
+
+  @keyframes sway {
+    50% {
+      transform: rotate(2.5deg);
+    }
+  }
+
+  /* Paired with a stroke-dasharray equal to the path length, this draws the
+     line on as if it were being written. */
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+/* Ruled notebook lines. The 28px rhythm has to match the text line-height
+   or the writing drifts off the lines as a note gets longer. */
+@utility ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 27px,
+    var(--rule) 27px 28px
+  );
+}
+
+@utility desk-glow {
+  background-image:
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 42%),
+    radial-gradient(circle at 88% 8%, color-mix(in srgb, #7c8cb4 9%, transparent), transparent 38%);
+  background-attachment: fixed;
 }
 
 body {
   margin: 0;
+  background-color: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
+/* TipTap renders into a contenteditable it owns, so its children can't be
+   styled with utility classes from JSX. */
+@layer components {
+  .note-prose {
+    line-height: 28px;
+  }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+  .note-prose:focus {
+    outline: none;
+  }
+
+  .note-prose > * {
+    margin: 0 0 28px;
+  }
+
+  .note-prose h1,
+  .note-prose h2,
+  .note-prose h3 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    line-height: 28px;
+  }
+
+  .note-prose h1 {
+    font-size: 1.5rem;
+  }
+
+  .note-prose h2 {
+    font-size: 1.25rem;
+  }
+
+  .note-prose ul,
+  .note-prose ol {
+    padding-left: 24px;
+  }
+
+  .note-prose ul {
+    list-style: disc;
+  }
+
+  .note-prose ol {
+    list-style: decimal;
+  }
+
+  .note-prose blockquote {
+    padding-left: 16px;
+    border-left: 3px solid var(--accent);
+    color: var(--ink-soft);
+  }
+
+  .note-prose code {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+    font-size: 0.9em;
+  }
+
+  .note-prose p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    color: var(--ink-faint);
+    pointer-events: none;
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
 }
