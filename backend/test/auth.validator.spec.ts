@@ -10,6 +10,12 @@ describe('registerSchema', () => {
     expect(parsed.email).to.equal('kaif@example.com');
   });
 
+  it('rejects a password past the 72 byte bcrypt limit', () => {
+    const tooLong = { ...valid, password: 'a'.repeat(73) };
+
+    expect(registerSchema.safeParse(tooLong).success).to.equal(false);
+  });
+
   it('rejects a password under 8 characters', () => {
     expect(registerSchema.safeParse({ ...valid, password: 'short' }).success).to.equal(false);
   });

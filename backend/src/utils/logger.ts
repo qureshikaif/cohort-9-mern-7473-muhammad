@@ -1,8 +1,8 @@
 import pino from 'pino';
-import { isDev } from '../config/env.js';
+import { env, isDev } from '../config/env.js';
 
 export const logger = pino({
-  level: process.env.LOG_LEVEL ?? (isDev ? 'debug' : 'info'),
+  level: env.LOG_LEVEL ?? (isDev ? 'debug' : 'info'),
   // Applied here rather than on the http logger, because pino-http inherits
   // redaction from the logger it is given instead of from its own options.
   redact: {

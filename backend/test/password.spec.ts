@@ -1,5 +1,10 @@
 import { expect } from 'chai';
-import { hashPassword, verifyPassword } from '../src/utils/password.js';
+import {
+  MAX_PASSWORD_BYTES,
+  hashPassword,
+  passwordByteLength,
+  verifyPassword,
+} from '../src/utils/password.js';
 
 describe('password hashing', function () {
   // bcrypt at 12 rounds takes a few hundred ms per call.
@@ -30,5 +35,23 @@ describe('password hashing', function () {
     const [first, second] = await Promise.all([hashPassword(plain), hashPassword(plain)]);
 
     expect(first).to.not.equal(second);
+  });
+
+  it('counts bytes rather than characters, since bcrypt limits bytes', () => {
+    expect(passwordByteLength('abc')).to.equal(3);
+    expect(passwordByteLength('é')).to.equal(2);
+  });
+
+  it('refuses a password past the bcrypt byte limit instead of truncating it', async () => {
+    const tooLong = 'a'.repeat(MAX_PASSWORD_BYTES + 1);
+    let threw = false;
+
+    try {
+      await hashPassword(tooLong);
+    } catch {
+      threw = true;
+    }
+
+    expect(threw).to.equal(true);
   });
 });

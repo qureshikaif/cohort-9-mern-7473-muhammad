@@ -40,9 +40,10 @@ describe('authenticate', () => {
 
   it('rejects a missing or malformed header with 401', () => {
     for (const header of [undefined, '', 'Basic abc', 'Bearer', 'Bearer ']) {
-      expect(statusFrom(() => authenticate(reqWith(header), res, noop)), String(header)).to.equal(
-        401
-      );
+      expect(
+        statusFrom(() => authenticate(reqWith(header), res, noop)),
+        String(header)
+      ).to.equal(401);
     }
   });
 

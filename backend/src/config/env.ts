@@ -15,6 +15,9 @@ const jwtSecret = (name: string) =>
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    // Constrained to Pino's levels so a typo fails at startup with a clear
+    // message instead of throwing from inside the logger.
+    LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).optional(),
     PORT: z.coerce.number().int().positive().max(65535).default(5000),
     CLIENT_URL: z.string().url().default('http://localhost:5173'),
 

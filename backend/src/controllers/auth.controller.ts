@@ -1,22 +1,27 @@
 import type { Request, Response } from 'express';
 import { loginUser, refreshSession, registerUser } from '../services/auth.service.js';
 import { logger } from '../utils/logger.js';
+import type { LoginInput, RefreshInput, RegisterInput } from '../validators/auth.validator.js';
 
-export async function register(req: Request, res: Response): Promise<void> {
+// The body generic is the third parameter of Request. Naming it here means the
+// controller and the validator can't drift apart without a compile error.
+type Body<T> = Request<Record<string, string | string[]>, unknown, T>;
+
+export async function register(req: Body<RegisterInput>, res: Response): Promise<void> {
   const result = await registerUser(req.body);
 
   logger.info({ userId: result.user.id }, 'User registered');
   res.status(201).json({ success: true, ...result });
 }
 
-export async function login(req: Request, res: Response): Promise<void> {
+export async function login(req: Body<LoginInput>, res: Response): Promise<void> {
   const result = await loginUser(req.body);
 
   logger.info({ userId: result.user.id }, 'User logged in');
   res.status(200).json({ success: true, ...result });
 }
 
-export async function refresh(req: Request, res: Response): Promise<void> {
+export async function refresh(req: Body<RefreshInput>, res: Response): Promise<void> {
   const result = await refreshSession(req.body.refreshToken);
 
   res.status(200).json({ success: true, ...result });
