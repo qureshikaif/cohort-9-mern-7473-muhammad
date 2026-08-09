@@ -216,3 +216,13 @@ export function changePassword(currentPassword: string, newPassword: string): Pr
 export function getProfile(): Promise<{ profile: Profile }> {
   return authed<{ profile: Profile }>('/users/me');
 }
+
+export function exportNotes(): Promise<{ notes: unknown[]; exportedAt: string; version: number }> {
+  return authed('/notes/export');
+}
+
+export function importNotes(notes: { title: string; content: string }[]): Promise<{
+  imported: number;
+}> {
+  return authed('/notes/import', { method: 'POST', body: JSON.stringify({ notes }) });
+}
