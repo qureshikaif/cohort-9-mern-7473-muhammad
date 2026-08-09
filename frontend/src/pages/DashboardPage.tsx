@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listNotes } from '../lib/api';
+import { useNoteEvents } from '../lib/useNoteEvents';
 import type { Note } from '../lib/types';
 import { NoteCard } from '../components/NoteCard';
 import { Alert, Spinner } from '../components/ui';
@@ -29,6 +30,27 @@ export function DashboardPage() {
     const timer = setTimeout(() => void load(search), search ? 300 : 0);
     return () => clearTimeout(timer);
   }, [search, load]);
+
+  // Applied to the list in place rather than refetching, so another tab's edit
+  // does not wipe out whatever the user is searching for here.
+  const handlers = useMemo(
+    () => ({
+      onCreated: (note: Note) => {
+        setNotes((current) =>
+          current.some((n) => n.id === note.id) ? current : [note, ...current]
+        );
+      },
+      onUpdated: (note: Note) => {
+        setNotes((current) => current.map((n) => (n.id === note.id ? note : n)));
+      },
+      onDeleted: (id: string) => {
+        setNotes((current) => current.filter((n) => n.id !== id));
+      },
+    }),
+    []
+  );
+
+  useNoteEvents(handlers);
 
   return (
     <>

@@ -6,6 +6,7 @@ import {
   listNotes,
   updateNote,
 } from '../services/note.service.js';
+import { emitToUser } from '../sockets/index.js';
 import { ApiError } from '../utils/ApiError.js';
 import type { JwtPayload } from '../utils/jwt.js';
 import { logger } from '../utils/logger.js';
@@ -27,6 +28,7 @@ export async function create(req: Body<CreateNoteInput>, res: Response): Promise
   const note = await createNote(authorId, req.body);
 
   logger.info({ userId: authorId, noteId: note.id }, 'Note created');
+  emitToUser(authorId, 'note:created', note);
   res.status(201).json({ success: true, note });
 }
 
@@ -50,6 +52,7 @@ export async function update(req: Body<UpdateNoteInput>, res: Response): Promise
   const note = await updateNote(authorId, id, req.body);
 
   logger.info({ userId: authorId, noteId: id }, 'Note updated');
+  emitToUser(authorId, 'note:updated', note);
   res.status(200).json({ success: true, note });
 }
 
@@ -60,5 +63,6 @@ export async function remove(req: Request, res: Response): Promise<void> {
   await deleteNote(authorId, id);
 
   logger.info({ userId: authorId, noteId: id }, 'Note deleted');
+  emitToUser(authorId, 'note:deleted', { id });
   res.status(204).send();
 }
