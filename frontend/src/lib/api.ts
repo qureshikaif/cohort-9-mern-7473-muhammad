@@ -1,6 +1,6 @@
 import type { Note, NoteList, Session } from './types';
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? '/api';
+import { API_BASE_URL as BASE_URL } from './runtimeConfig';
 
 const STORAGE_KEY = 'notes-app.session';
 
