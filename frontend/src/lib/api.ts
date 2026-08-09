@@ -1,4 +1,4 @@
-import type { Note, NoteList, Session } from './types';
+import type { Note, NoteList, Profile, Session } from './types';
 
 import { API_BASE_URL as BASE_URL } from './runtimeConfig';
 
@@ -164,4 +164,8 @@ export function updateNote(id: string, title: string, content: string): Promise<
 
 export function deleteNote(id: string): Promise<void> {
   return authed<void>(`/notes/${id}`, { method: 'DELETE' });
+}
+
+export function getProfile(): Promise<{ profile: Profile }> {
+  return authed<{ profile: Profile }>('/users/me');
 }

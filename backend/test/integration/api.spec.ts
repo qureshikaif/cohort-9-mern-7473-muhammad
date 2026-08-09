@@ -168,4 +168,23 @@ describe('api (integration)', () => {
     expect(status).to.equal(404);
     expect(body.success).to.equal(false);
   });
+
+  it('returns the signed-in user profile with a note count', async () => {
+    const token = await signUp('kaif@example.com');
+    await call('POST', '/api/notes', { token, body: { title: 'One', content: '' } });
+    await call('POST', '/api/notes', { token, body: { title: 'Two', content: '' } });
+
+    const { status, body } = await call('GET', '/api/users/me', { token });
+    const profile = body.profile as Json;
+
+    expect(status).to.equal(200);
+    expect(profile.email).to.equal('kaif@example.com');
+    expect(profile.noteCount).to.equal(2);
+    expect(profile.joinedAt).to.be.a('string');
+    expect(profile.password).to.equal(undefined);
+  });
+
+  it('refuses the profile endpoint without a token', async () => {
+    expect((await call('GET', '/api/users/me')).status).to.equal(401);
+  });
 });
