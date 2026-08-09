@@ -26,10 +26,31 @@ Health check: <http://localhost:5000/api/health>
 | `npm start`               | Run the compiled server (`dist/`)  |
 | `npm run typecheck`       | Type-check the project             |
 | `npm test`                | Run unit tests (Mocha + Chai)      |
+| `npm run test:integration`| Run service tests against a database |
 | `npm run lint`            | Lint with ESLint                   |
 | `npm run format`          | Format with Prettier               |
 | `npm run prisma:generate` | Generate the Prisma client         |
 | `npm run prisma:migrate`  | Create/apply a dev migration       |
+
+## Integration tests
+
+`npm test` needs nothing but Node. The service tests talk to a real PostgreSQL,
+because that is the only way to cover the queries themselves — ownership
+filters, the unique index on email, and the cascade from user to notes.
+
+They run against a throwaway database, never your development one. Create it,
+apply the migrations, then run them:
+
+```bash
+createdb notes_app_test
+echo 'DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/notes_app_test' > .env.test
+npx dotenv -e .env.test -- npx prisma migrate deploy
+npm run test:integration
+```
+
+`.env.test` is gitignored. Every spec truncates both tables before it runs, so
+the database is left empty between tests and the order they run in does not
+matter.
 
 ## Folder structure
 
