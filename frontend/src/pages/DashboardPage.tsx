@@ -4,6 +4,7 @@ import { listNotes } from '../lib/api';
 import { useNoteEvents } from '../lib/useNoteEvents';
 import type { Note } from '../lib/types';
 import { NoteCard } from '../components/NoteCard';
+import { TransferButtons } from '../components/TransferButtons';
 import { Alert, Spinner } from '../components/ui';
 
 export function DashboardPage() {
@@ -13,6 +14,7 @@ export function DashboardPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
   const load = useCallback(async (term: string) => {
     try {
@@ -62,6 +64,15 @@ export function DashboardPage() {
 
         <div className="flex-1" />
 
+        <TransferButtons
+          onError={setError}
+          onImported={(count) => {
+            setError('');
+            setNotice(`Imported ${count} ${count === 1 ? 'note' : 'notes'}`);
+            void load(search);
+          }}
+        />
+
         <input
           type="search"
           value={search}
@@ -73,6 +84,12 @@ export function DashboardPage() {
       </div>
 
       {error ? <Alert>{error}</Alert> : null}
+
+      {notice ? (
+        <p className="mb-4 rounded-lg border-l-[3px] border-accent bg-accent/8 px-3.5 py-2.5 text-sm">
+          {notice}
+        </p>
+      ) : null}
 
       {loading ? (
         <Spinner label="Opening your notebook..." />
