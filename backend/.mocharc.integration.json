@@ -1,0 +1,7 @@
+{
+  "extension": ["ts"],
+  "spec": "test/integration/**/*.spec.ts",
+  "node-option": ["import=tsx", "import=./test/integration/env.setup.ts"],
+  "timeout": 20000,
+  "exit": true
+}
