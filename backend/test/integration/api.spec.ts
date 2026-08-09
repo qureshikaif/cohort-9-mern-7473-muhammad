@@ -187,4 +187,74 @@ describe('api (integration)', () => {
   it('refuses the profile endpoint without a token', async () => {
     expect((await call('GET', '/api/users/me')).status).to.equal(401);
   });
+
+  describe('export and import', () => {
+    it('round-trips notes between two accounts', async () => {
+      const source = await signUp('source@example.com');
+      await call('POST', '/api/notes', {
+        token: source,
+        body: { title: 'Kept', content: '<p>body</p>' },
+      });
+
+      const exported = await call('GET', '/api/notes/export', { token: source });
+      expect(exported.status).to.equal(200);
+      expect(exported.body.version).to.equal(1);
+
+      const notes = exported.body.notes as Json[];
+      expect(notes).to.have.lengthOf(1);
+      // Ids and the author are deliberately absent, they mean nothing elsewhere.
+      expect(notes[0]?.id).to.equal(undefined);
+      expect(notes[0]?.authorId).to.equal(undefined);
+
+      const target = await signUp('target@example.com');
+      const imported = await call('POST', '/api/notes/import', {
+        token: target,
+        body: { notes },
+      });
+
+      expect(imported.status).to.equal(201);
+      expect(imported.body.imported).to.equal(1);
+
+      const listed = await call('GET', '/api/notes', { token: target });
+      expect((listed.body.items as Json[])[0]?.title).to.equal('Kept');
+    });
+
+    it('exports only the caller notes', async () => {
+      const mine = await signUp('mine@example.com');
+      const theirs = await signUp('theirs@example.com');
+      await call('POST', '/api/notes', { token: theirs, body: { title: 'Theirs', content: '' } });
+
+      const exported = await call('GET', '/api/notes/export', { token: mine });
+
+      expect(exported.body.notes as Json[]).to.have.lengthOf(0);
+    });
+
+    it('rejects an import with no usable notes', async () => {
+      const token = await signUp('kaif@example.com');
+
+      const empty = await call('POST', '/api/notes/import', { token, body: { notes: [] } });
+      const untitled = await call('POST', '/api/notes/import', {
+        token,
+        body: { notes: [{ title: '', content: 'x' }] },
+      });
+
+      expect(empty.status).to.equal(400);
+      expect(untitled.status).to.equal(400);
+    });
+
+    it('does not treat export as a note id', async () => {
+      const token = await signUp('kaif@example.com');
+
+      // /export is registered before /:id; if that order changed this would 400
+      // on the uuid check instead of returning a payload.
+      expect((await call('GET', '/api/notes/export', { token })).status).to.equal(200);
+    });
+
+    it('refuses both endpoints without a token', async () => {
+      expect((await call('GET', '/api/notes/export')).status).to.equal(401);
+      expect((await call('POST', '/api/notes/import', { body: { notes: [] } })).status).to.equal(
+        401
+      );
+    });
+  });
 });
