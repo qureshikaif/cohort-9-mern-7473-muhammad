@@ -25,3 +25,12 @@ export interface Session {
   accessToken: string;
   refreshToken: string;
 }
+
+export interface Profile {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  joinedAt: string;
+  noteCount: number;
+}
