@@ -24,9 +24,6 @@ export interface AuthResult {
 
 const publicFields = { id: true, name: true, email: true, role: true } as const;
 
-// compared against when the email does not exist, so login takes the same time either way
-const ABSENT_USER_HASH = '$2b$12$M85q71euChvt3Ug/4N5dLu6y./5VUu0MAuiOTVbZ/tokWlIevYRRq';
-
 // P2002 = unique constraint failed
 function isDuplicateEmail(error: unknown): boolean {
   return (
@@ -76,9 +73,13 @@ export async function registerUser(input: RegisterInput): Promise<AuthResult> {
 export async function loginUser(input: LoginInput): Promise<AuthResult> {
   const user = await prisma.user.findUnique({ where: { email: input.email } });
 
-  const matches = await verifyPassword(input.password, user?.password ?? ABSENT_USER_HASH);
+  if (!user) {
+    throw ApiError.unauthorized('Invalid email or password');
+  }
 
-  if (!user || !matches) {
+  const matches = await verifyPassword(input.password, user.password);
+
+  if (!matches) {
     throw ApiError.unauthorized('Invalid email or password');
   }
 
