@@ -6,7 +6,7 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       name: 'Kaif',
       email: 'kaif@example.com',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(result.success).to.equal(true);
@@ -16,7 +16,7 @@ describe('registerSchema', () => {
     const parsed = registerSchema.parse({
       name: 'Kaif',
       email: '   kaif@example.com   ',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(parsed.email).to.equal('kaif@example.com');
@@ -26,7 +26,7 @@ describe('registerSchema', () => {
     const parsed = registerSchema.parse({
       name: 'Kaif',
       email: 'KAIF@EXAMPLE.COM',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(parsed.email).to.equal('kaif@example.com');
@@ -36,7 +36,7 @@ describe('registerSchema', () => {
     const parsed = registerSchema.parse({
       name: '  Kaif  ',
       email: 'kaif@example.com',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(parsed.name).to.equal('Kaif');
@@ -68,7 +68,7 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       name: 'Kaif',
       email: 'not-an-email',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(result.success).to.equal(false);
@@ -78,7 +78,7 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       name: 'Kaif',
       email: 'kaif@',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(result.success).to.equal(false);
@@ -88,7 +88,7 @@ describe('registerSchema', () => {
     const result = registerSchema.safeParse({
       name: 'K',
       email: 'kaif@example.com',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(result.success).to.equal(false);
@@ -122,7 +122,7 @@ describe('loginSchema', () => {
   it('should accept a normal login', () => {
     const result = loginSchema.safeParse({
       email: 'kaif@example.com',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(result.success).to.equal(true);
@@ -131,7 +131,7 @@ describe('loginSchema', () => {
   it('should lowercase the email on login as well', () => {
     const parsed = loginSchema.parse({
       email: 'KAIF@Example.com',
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(parsed.email).to.equal('kaif@example.com');
@@ -157,7 +157,7 @@ describe('loginSchema', () => {
 
   it('rejects a login with no email', () => {
     const result = loginSchema.safeParse({
-      password: 'long-enough-password',
+      password: 'Kaif@123',
     });
 
     expect(result.success).to.equal(false);

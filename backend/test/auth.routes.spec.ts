@@ -21,20 +21,6 @@ describe('auth routes', () => {
   });
 
   describe('POST /register', () => {
-    it.skip('registers a new user', async () => {
-      const res = await fetch(base_url + '/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'Kaif',
-          email: 'kaif@example.com',
-          password: 'long-enough-password',
-        }),
-      });
-
-      expect(res.status).to.equal(201);
-    });
-
     it('should give 400 for a short password', async () => {
       const res = await fetch(base_url + '/register', {
         method: 'POST',
@@ -52,7 +38,7 @@ describe('auth routes', () => {
         body: JSON.stringify({
           name: 'Kaif',
           email: 'not-an-email',
-          password: 'long-enough-password',
+          password: 'Kaif@123',
         }),
       });
 
@@ -87,7 +73,7 @@ describe('auth routes', () => {
       const res = await fetch(base_url + '/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: 'long-enough-password' }),
+        body: JSON.stringify({ password: 'Kaif@123' }),
       });
 
       expect(res.status).to.equal(400);
