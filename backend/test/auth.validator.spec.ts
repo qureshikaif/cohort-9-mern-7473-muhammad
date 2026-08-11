@@ -2,55 +2,163 @@ import { expect } from 'chai';
 import { loginSchema, registerSchema } from '../src/validators/auth.validator.js';
 
 describe('registerSchema', () => {
-  const valid = { name: 'Kaif', email: 'Kaif@Example.com', password: 'long-enough-password' };
+  it('should accept a normal user', () => {
+    const result = registerSchema.safeParse({
+      name: 'Kaif',
+      email: 'kaif@example.com',
+      password: 'long-enough-password',
+    });
 
-  it('trims and lowercases the email', () => {
-    const parsed = registerSchema.parse({ ...valid, email: '  Kaif@Example.COM  ' });
+    expect(result.success).to.equal(true);
+  });
+
+  it('should trim the email', () => {
+    const parsed = registerSchema.parse({
+      name: 'Kaif',
+      email: '   kaif@example.com   ',
+      password: 'long-enough-password',
+    });
 
     expect(parsed.email).to.equal('kaif@example.com');
   });
 
-  it('rejects a password past the 72 byte bcrypt limit', () => {
-    const tooLong = { ...valid, password: 'a'.repeat(73) };
+  it('should lowercase the email', () => {
+    const parsed = registerSchema.parse({
+      name: 'Kaif',
+      email: 'KAIF@EXAMPLE.COM',
+      password: 'long-enough-password',
+    });
 
-    expect(registerSchema.safeParse(tooLong).success).to.equal(false);
+    expect(parsed.email).to.equal('kaif@example.com');
   });
 
-  it('rejects a password under 8 characters', () => {
-    expect(registerSchema.safeParse({ ...valid, password: 'short' }).success).to.equal(false);
+  it('should trim the name too', () => {
+    const parsed = registerSchema.parse({
+      name: '  Kaif  ',
+      email: 'kaif@example.com',
+      password: 'long-enough-password',
+    });
+
+    expect(parsed.name).to.equal('Kaif');
   });
 
-  it('rejects a malformed email', () => {
-    expect(registerSchema.safeParse({ ...valid, email: 'not-an-email' }).success).to.equal(false);
-  });
+  it('rejects a password of 73 bytes', () => {
+    const longPassword = 'a'.repeat(73);
 
-  it('rejects a name under 2 characters', () => {
-    expect(registerSchema.safeParse({ ...valid, name: 'K' }).success).to.equal(false);
-  });
-
-  it('reports every invalid field at once', () => {
-    const result = registerSchema.safeParse({ name: 'K', email: 'nope', password: 'short' });
+    const result = registerSchema.safeParse({
+      name: 'Kaif',
+      email: 'kaif@example.com',
+      password: longPassword,
+    });
 
     expect(result.success).to.equal(false);
+  });
+
+  it('rejects a short password', () => {
+    const result = registerSchema.safeParse({
+      name: 'Kaif',
+      email: 'kaif@example.com',
+      password: 'short',
+    });
+
+    expect(result.success).to.equal(false);
+  });
+
+  it('should reject a bad email', () => {
+    const result = registerSchema.safeParse({
+      name: 'Kaif',
+      email: 'not-an-email',
+      password: 'long-enough-password',
+    });
+
+    expect(result.success).to.equal(false);
+  });
+
+  it('should reject a bad email', () => {
+    const result = registerSchema.safeParse({
+      name: 'Kaif',
+      email: 'kaif@',
+      password: 'long-enough-password',
+    });
+
+    expect(result.success).to.equal(false);
+  });
+
+  it('should reject a one letter name', () => {
+    const result = registerSchema.safeParse({
+      name: 'K',
+      email: 'kaif@example.com',
+      password: 'long-enough-password',
+    });
+
+    expect(result.success).to.equal(false);
+  });
+
+  it('should reject missing fields', () => {
+    const result = registerSchema.safeParse({});
+
+    expect(result.success).to.equal(false);
+  });
+
+  it('gives back an error for every bad field', () => {
+    const result = registerSchema.safeParse({
+      name: 'K',
+      email: 'nope',
+      password: 'short',
+    });
+
+    expect(result.success).to.equal(false);
+
     if (!result.success) {
-      expect(Object.keys(result.error.flatten().fieldErrors)).to.have.members([
-        'name',
-        'email',
-        'password',
-      ]);
+      const fieldErrors = result.error.flatten().fieldErrors;
+      expect(fieldErrors.name).to.not.equal(undefined);
+      expect(fieldErrors.email).to.not.equal(undefined);
+      expect(fieldErrors.password).to.not.equal(undefined);
     }
   });
 });
 
 describe('loginSchema', () => {
-  it('accepts any non-empty password so old accounts can still sign in', () => {
-    const result = loginSchema.safeParse({ email: 'kaif@example.com', password: 'x' });
+  it('should accept a normal login', () => {
+    const result = loginSchema.safeParse({
+      email: 'kaif@example.com',
+      password: 'long-enough-password',
+    });
 
     expect(result.success).to.equal(true);
   });
 
-  it('rejects an empty password', () => {
-    const result = loginSchema.safeParse({ email: 'kaif@example.com', password: '' });
+  it('should lowercase the email on login as well', () => {
+    const parsed = loginSchema.parse({
+      email: 'KAIF@Example.com',
+      password: 'long-enough-password',
+    });
+
+    expect(parsed.email).to.equal('kaif@example.com');
+  });
+
+  it('accepts a short password because old accounts may have one', () => {
+    const result = loginSchema.safeParse({
+      email: 'kaif@example.com',
+      password: 'x',
+    });
+
+    expect(result.success).to.equal(true);
+  });
+
+  it('rejcts an empty password', () => {
+    const result = loginSchema.safeParse({
+      email: 'kaif@example.com',
+      password: '',
+    });
+
+    expect(result.success).to.equal(false);
+  });
+
+  it('rejects a login with no email', () => {
+    const result = loginSchema.safeParse({
+      password: 'long-enough-password',
+    });
 
     expect(result.success).to.equal(false);
   });

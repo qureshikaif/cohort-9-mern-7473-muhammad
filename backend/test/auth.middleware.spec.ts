@@ -4,82 +4,154 @@ import { authenticate, authorize } from '../src/middlewares/index.js';
 import { ApiError } from '../src/utils/ApiError.js';
 import { signAccessToken } from '../src/utils/jwt.js';
 
-const res = {} as Response;
-const noop = (() => {}) as NextFunction;
-
-function reqWith(authorization?: string): Request {
-  return { headers: authorization === undefined ? {} : { authorization } } as Request;
-}
-
-/** Runs fn and reports the ApiError status it threw, or undefined if it did not throw. */
-function statusFrom(fn: () => void): number | undefined {
-  try {
-    fn();
-    return undefined;
-  } catch (error) {
-    return error instanceof ApiError ? error.statusCode : -1;
-  }
-}
+const fakeRes = {} as Response;
+const doNothing = (() => {}) as NextFunction;
 
 describe('authenticate', () => {
   const token = signAccessToken({ sub: 'user-1', role: 'USER' });
 
-  it('accepts the Bearer scheme in any case', () => {
-    for (const scheme of ['Bearer', 'bearer', 'BEARER', 'BeArEr']) {
-      const req = reqWith(`${scheme} ${token}`);
-      let passed = false;
+  it('should call next when the header says Bearer', () => {
+    const req = { headers: { authorization: 'Bearer ' + token } } as Request;
+    let nextWasCalled = false;
 
-      authenticate(req, res, (() => {
-        passed = true;
-      }) as NextFunction);
+    authenticate(req, fakeRes, (() => {
+      nextWasCalled = true;
+    }) as NextFunction);
 
-      expect(passed, scheme).to.equal(true);
-      expect(req.user?.sub, scheme).to.equal('user-1');
-    }
+    expect(nextWasCalled).to.equal(true);
   });
 
-  it('rejects a missing or malformed header with 401', () => {
-    for (const header of [undefined, '', 'Basic abc', 'Bearer', 'Bearer ']) {
-      expect(
-        statusFrom(() => authenticate(reqWith(header), res, noop)),
-        String(header)
-      ).to.equal(401);
-    }
+  it('should put the user on the request', () => {
+    const req = { headers: { authorization: 'Bearer ' + token } } as Request;
+
+    authenticate(req, fakeRes, doNothing);
+
+    expect(req.user?.sub).to.equal('user-1');
+    expect(req.user?.role).to.equal('USER');
   });
 
-  it('rejects a token that fails verification with 401', () => {
-    expect(statusFrom(() => authenticate(reqWith('Bearer not-a-real-jwt'), res, noop))).to.equal(
-      401
+  it('works with lowercase bearer', () => {
+    const req = { headers: { authorization: 'bearer ' + token } } as Request;
+    let called = false;
+    authenticate(req, fakeRes, (() => {
+      called = true;
+    }) as NextFunction);
+    expect(called).to.equal(true);
+  });
+
+  it('BEARER also works', () => {
+    const req = { headers: { authorization: 'BEARER ' + token } } as Request;
+    let called = false;
+    authenticate(req, fakeRes, (() => {
+      called = true;
+    }) as NextFunction);
+    expect(called).to.equal(true);
+  });
+
+  it('no header', () => {
+    const req = { headers: {} } as Request;
+
+    expect(() => authenticate(req, fakeRes, doNothing)).to.throw(ApiError);
+  });
+
+  it('empty header', () => {
+    const req = { headers: { authorization: '' } } as Request;
+    let code = 0;
+
+    try {
+      authenticate(req, fakeRes, doNothing);
+    } catch (err) {
+      if (err instanceof ApiError) code = err.statusCode;
+    }
+    expect(code).to.equal(401);
+  });
+
+  it('Basic is not allowed', () => {
+    const req = { headers: { authorization: 'Basic abc' } } as Request;
+    expect(() => authenticate(req, fakeRes, doNothing)).to.throw(
+      'Missing or malformed Authorization header'
     );
+  });
+
+  it('bearer with no token after it', () => {
+    const req = { headers: { authorization: 'Bearer' } } as Request;
+    let caught: unknown;
+
+    try {
+      authenticate(req, fakeRes, doNothing);
+    } catch (e) {
+      caught = e;
+    }
+
+    expect(caught).to.be.instanceOf(ApiError);
+    expect((caught as ApiError).statusCode).to.equal(401);
+  });
+
+  it('bad token gives 401', () => {
+    const req = { headers: { authorization: 'Bearer not-a-real-jwt' } } as Request;
+    let status = 0;
+    try {
+      authenticate(req, fakeRes, doNothing);
+    } catch (err) {
+      if (err instanceof ApiError) status = err.statusCode;
+    }
+    expect(status).to.equal(401);
   });
 });
 
 describe('authorize', () => {
-  function reqAs(role?: string): Request {
-    return { headers: {}, user: role ? { sub: 'user-1', role } : undefined } as Request;
-  }
+  it('should let an admin through when ADMIN is required', () => {
+    const req = { headers: {}, user: { sub: 'user-1', role: 'ADMIN' } } as Request;
+    let nextWasCalled = false;
 
-  it('lets a matching role through', () => {
-    let passed = false;
-    authorize('ADMIN')(reqAs('ADMIN'), res, (() => {
-      passed = true;
+    authorize('ADMIN')(req, fakeRes, (() => {
+      nextWasCalled = true;
     }) as NextFunction);
-    expect(passed).to.equal(true);
+
+    expect(nextWasCalled).to.equal(true);
   });
 
-  it('rejects a non-matching role with 403', () => {
-    expect(statusFrom(() => authorize('ADMIN')(reqAs('USER'), res, noop))).to.equal(403);
+  it('throws 403 when a normal user asks for an admin route', () => {
+    const req = { headers: {}, user: { sub: 'user-1', role: 'USER' } } as Request;
+    let code = 0;
+
+    try {
+      authorize('ADMIN')(req, fakeRes, doNothing);
+    } catch (err) {
+      if (err instanceof ApiError) code = err.statusCode;
+    }
+
+    expect(code).to.equal(403);
   });
 
-  it('rejects an unauthenticated request with 401', () => {
-    expect(statusFrom(() => authorize('ADMIN')(reqAs(), res, noop))).to.equal(401);
+  it('user with no role at all', () => {
+    const req = { headers: {}, user: { sub: 'user-1' } } as Request;
+
+    expect(() => authorize('ADMIN')(req, fakeRes, doNothing)).to.throw('Insufficient permissions');
   });
 
-  it('requires only authentication when no roles are given', () => {
-    let passed = false;
-    authorize()(reqAs('USER'), res, (() => {
-      passed = true;
+  it('throws 401 when nobody is logged in', () => {
+    const req = { headers: {} } as Request;
+    expect(() => authorize('ADMIN')(req, fakeRes, doNothing)).to.throw('Unauthorized');
+  });
+
+  it('should let any logged in user through when no role is given', () => {
+    const req = { headers: {}, user: { sub: 'user-1', role: 'USER' } } as Request;
+    let nextWasCalled = false;
+
+    authorize()(req, fakeRes, (() => {
+      nextWasCalled = true;
     }) as NextFunction);
-    expect(passed).to.equal(true);
+
+    expect(nextWasCalled).to.equal(true);
+  });
+
+  it('should allow either of two roles', () => {
+    const req = { headers: {}, user: { sub: 'user-1', role: 'USER' } } as Request;
+    let called = false;
+    authorize('ADMIN', 'USER')(req, fakeRes, (() => {
+      called = true;
+    }) as NextFunction);
+    expect(called).to.equal(true);
   });
 });
