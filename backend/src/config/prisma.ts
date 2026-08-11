@@ -21,7 +21,6 @@ export async function disconnectDatabase(): Promise<void> {
   try {
     await prisma.$disconnect();
   } catch (error) {
-    // Shutting down anyway, so log and continue rather than masking the original exit reason.
     logger.error({ err: error }, 'Failed to disconnect from PostgreSQL');
   }
 }

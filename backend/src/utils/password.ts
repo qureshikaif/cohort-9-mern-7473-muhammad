@@ -1,0 +1,22 @@
+import bcrypt from 'bcryptjs';
+
+const SALT_ROUNDS = 12;
+
+// bcrypt only looks at the first 72 bytes
+export const MAX_PASSWORD_BYTES = 72;
+
+export function passwordByteLength(plain: string): number {
+  return new TextEncoder().encode(plain).length;
+}
+
+export function hashPassword(plain: string): Promise<string> {
+  if (passwordByteLength(plain) > MAX_PASSWORD_BYTES) {
+    throw new Error(`Password exceeds the ${MAX_PASSWORD_BYTES} byte bcrypt limit`);
+  }
+
+  return bcrypt.hash(plain, SALT_ROUNDS);
+}
+
+export function verifyPassword(plain: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(plain, hash);
+}

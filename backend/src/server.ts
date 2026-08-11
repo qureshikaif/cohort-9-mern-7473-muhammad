@@ -9,8 +9,6 @@ import { logger } from './utils/logger.js';
 async function bootstrap(): Promise<void> {
   await connectDatabase();
 
-  // Anything after this point owns an open connection pool, so release it before
-  // letting a startup failure propagate.
   try {
     const app = createApp();
     const httpServer = createServer(app);
