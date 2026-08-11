@@ -1,8 +1,6 @@
 import 'dotenv/config';
 import { z } from 'zod';
 
-// Both signing keys share the same rules: long enough to resist brute force, and
-// not left as the placeholder copied out of .env.example.
 const jwtSecret = (name: string) =>
   z
     .string()
@@ -15,14 +13,10 @@ const jwtSecret = (name: string) =>
 const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-    // Constrained to Pino's levels so a typo fails at startup with a clear
-    // message instead of throwing from inside the logger.
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).optional(),
     PORT: z.coerce.number().int().positive().max(65535).default(5000),
     CLIENT_URL: z.string().url().default('http://localhost:5173'),
 
-    // PrismaPg needs a direct postgres connection string, so reject other schemes
-    // (e.g. prisma+postgres://) here instead of failing when the pool is created.
     DATABASE_URL: z
       .string()
       .min(1, 'DATABASE_URL is required')

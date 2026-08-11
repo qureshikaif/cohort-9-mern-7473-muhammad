@@ -32,8 +32,6 @@ export function errorHandler(
     logger.error({ err }, message);
   }
 
-  // 5xx messages can carry driver or library internals, so log them but never
-  // send them to the client.
   res.status(statusCode).json({
     success: false,
     message: isServerError ? 'Internal Server Error' : message,

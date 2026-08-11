@@ -24,13 +24,10 @@ export interface AuthResult {
 
 const publicFields = { id: true, name: true, email: true, role: true } as const;
 
-// A real bcrypt hash of a throwaway value. Login compares against it when the
-// email is unknown so both branches do the same work, otherwise the faster
-// no-such-user path would let someone discover accounts by timing alone.
+// compared against when the email does not exist, so login takes the same time either way
 const ABSENT_USER_HASH = '$2b$12$M85q71euChvt3Ug/4N5dLu6y./5VUu0MAuiOTVbZ/tokWlIevYRRq';
 
-// Prisma raises P2002 when a unique index rejects a write. Matched structurally
-// so this does not depend on the generated client's error class location.
+// P2002 = unique constraint failed
 function isDuplicateEmail(error: unknown): boolean {
   return (
     typeof error === 'object' &&
@@ -68,8 +65,6 @@ export async function registerUser(input: RegisterInput): Promise<AuthResult> {
 
     return { user, ...issueTokens(user) };
   } catch (error) {
-    // Two concurrent signups can both clear the check above. The unique index is
-    // what actually decides, so report its rejection as the same conflict.
     if (isDuplicateEmail(error)) {
       throw ApiError.conflict('An account with this email already exists');
     }
@@ -83,8 +78,6 @@ export async function loginUser(input: LoginInput): Promise<AuthResult> {
 
   const matches = await verifyPassword(input.password, user?.password ?? ABSENT_USER_HASH);
 
-  // One error for both causes, so the response cannot be used to find out which
-  // addresses have accounts.
   if (!user || !matches) {
     throw ApiError.unauthorized('Invalid email or password');
   }
@@ -108,8 +101,6 @@ export async function refreshSession(refreshToken: string): Promise<AuthResult> 
     throw ApiError.unauthorized('Invalid or expired refresh token');
   }
 
-  // verifyRefreshToken casts whatever jwt decoded, so the shape is only a claim
-  // until it is checked. Guard before the value reaches a query.
   if (typeof payload.sub !== 'string' || payload.sub.length === 0) {
     throw ApiError.unauthorized('Invalid refresh token');
   }

@@ -1,5 +1,3 @@
-// Loaded before the specs so src/config/env.ts sees a valid environment and does
-// not exit the process. Values are throwaway and never touch a real database.
 process.env.NODE_ENV ??= 'test';
 process.env.LOG_LEVEL ??= 'silent';
 process.env.DATABASE_URL ??= 'postgresql://test:test@127.0.0.1:5432/test';

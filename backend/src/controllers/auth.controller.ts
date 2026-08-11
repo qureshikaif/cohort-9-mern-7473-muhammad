@@ -3,8 +3,6 @@ import { loginUser, refreshSession, registerUser } from '../services/auth.servic
 import { logger } from '../utils/logger.js';
 import type { LoginInput, RefreshInput, RegisterInput } from '../validators/auth.validator.js';
 
-// The body generic is the third parameter of Request. Naming it here means the
-// controller and the validator can't drift apart without a compile error.
 type Body<T> = Request<Record<string, string | string[]>, unknown, T>;
 
 export async function register(req: Body<RegisterInput>, res: Response): Promise<void> {

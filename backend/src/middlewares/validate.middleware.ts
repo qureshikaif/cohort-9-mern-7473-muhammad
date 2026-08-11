@@ -10,8 +10,6 @@ export function validateBody(schema: ZodTypeAny): RequestHandler {
       return;
     }
 
-    // Replaced with the parsed value so downstream code gets the trimmed and
-    // lowercased fields rather than the raw request body.
     req.body = result.data;
     next();
   };

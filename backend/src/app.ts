@@ -18,7 +18,6 @@ export function createApp(): Application {
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true }));
 
-  // Registered before the limiter so uptime probes never get a 429.
   app.use('/api/health', healthRoutes);
   app.use('/api', apiRateLimiter, routes);
 
