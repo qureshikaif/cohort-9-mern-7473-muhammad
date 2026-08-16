@@ -7,10 +7,14 @@ import {
   updateNote,
 } from '../services/note.service.js';
 import { ApiError } from '../utils/ApiError.js';
+import type { JwtPayload } from '../utils/jwt.js';
 import { logger } from '../utils/logger.js';
 import { listNotesSchema, noteIdSchema } from '../validators/note.validator.js';
+import type { CreateNoteInput, UpdateNoteInput } from '../validators/note.validator.js';
 
-function currentUserId(req: Request): string {
+type Body<T> = Request<Record<string, string | string[]>, unknown, T>;
+
+function currentUserId(req: { user?: JwtPayload }): string {
   if (!req.user) {
     throw ApiError.unauthorized();
   }
@@ -18,7 +22,7 @@ function currentUserId(req: Request): string {
   return req.user.sub;
 }
 
-export async function create(req: Request, res: Response): Promise<void> {
+export async function create(req: Body<CreateNoteInput>, res: Response): Promise<void> {
   const authorId = currentUserId(req);
   const note = await createNote(authorId, req.body);
 
@@ -40,7 +44,7 @@ export async function getOne(req: Request, res: Response): Promise<void> {
   res.status(200).json({ success: true, note });
 }
 
-export async function update(req: Request, res: Response): Promise<void> {
+export async function update(req: Body<UpdateNoteInput>, res: Response): Promise<void> {
   const { id } = noteIdSchema.parse(req.params);
   const authorId = currentUserId(req);
   const note = await updateNote(authorId, id, req.body);
