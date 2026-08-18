@@ -1,10 +1,23 @@
+import { useState } from 'react';
+import Login from './Login';
+import Notes from './Notes';
+
 export default function App() {
+  const [token, setToken] = useState(localStorage.getItem('token') ?? '');
+
+  function login(newToken: string) {
+    localStorage.setItem('token', newToken);
+    setToken(newToken);
+  }
+
+  function logout() {
+    localStorage.removeItem('token');
+    setToken('');
+  }
+
   return (
-    <div className="desk-glow grid min-h-screen place-items-center px-5">
-      <div className="w-full max-w-sm rounded-xs border border-edge bg-sheet px-8 py-9 shadow-lg">
-        <h1 className="mb-1 font-serif text-3xl font-medium">Notes</h1>
-        <p className="text-sm text-ink-soft">The screens arrive in the next PR.</p>
-      </div>
+    <div className="desk-glow min-h-screen px-5 py-10">
+      {token ? <Notes token={token} onLogout={logout} /> : <Login onLogin={login} />}
     </div>
   );
 }
