@@ -1,16 +1,11 @@
 @import 'tailwindcss';
 
-/* Semantic tokens live as plain variables so the dark scheme can swap them,
-   then @theme inline maps them to Tailwind utilities that follow the swap. */
 :root {
   --paper: #fbf7ef;
   --sheet: #fffdf8;
   --ink: #262320;
   --ink-soft: #6b6459;
-  --ink-faint: #a89e8f;
   --edge: #e6dcc9;
-  --rule: #d9e3ef;
-  --margin-line: #e2a9a0;
   --accent: #b4573f;
   --accent-soft: #f3e2dc;
   --danger: #a8342b;
@@ -24,10 +19,7 @@
     --sheet: #1c1f25;
     --ink: #e9e4d9;
     --ink-soft: #a29c90;
-    --ink-faint: #6d6862;
     --edge: #2a2e36;
-    --rule: #2b323d;
-    --margin-line: #7d4a44;
     --accent: #e08163;
     --accent-soft: #2e2320;
     --danger: #e2726a;
@@ -39,10 +31,7 @@
   --color-sheet: var(--sheet);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
-  --color-ink-faint: var(--ink-faint);
   --color-edge: var(--edge);
-  --color-rule: var(--rule);
-  --color-margin-line: var(--margin-line);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-danger: var(--danger);
@@ -51,34 +40,7 @@
 
   --ease-paper: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  --animate-page-in: page-in 420ms var(--ease-paper) both;
-  --animate-sheet-in: sheet-in 520ms var(--ease-paper) both;
-  --animate-card-in: card-in 420ms var(--ease-paper) both;
   --animate-nudge: nudge 380ms var(--ease-paper);
-  --animate-float: float 7s ease-in-out infinite;
-  --animate-sway: sway 9s ease-in-out infinite;
-  --animate-draw: draw 2.4s var(--ease-paper) 500ms forwards;
-
-  @keyframes page-in {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-  }
-
-  @keyframes sheet-in {
-    from {
-      opacity: 0;
-      transform: translateY(18px) rotate(-1deg);
-    }
-  }
-
-  @keyframes card-in {
-    from {
-      opacity: 0;
-      transform: translateY(14px) rotate(1deg);
-    }
-  }
 
   @keyframes nudge {
     20% {
@@ -91,36 +53,6 @@
       transform: translateX(-2px);
     }
   }
-
-  @keyframes float {
-    50% {
-      transform: translateY(-9px);
-    }
-  }
-
-  @keyframes sway {
-    50% {
-      transform: rotate(2.5deg);
-    }
-  }
-
-  /* Paired with a stroke-dasharray equal to the path length, this draws the
-     line on as if it were being written. */
-  @keyframes draw {
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-}
-
-/* Ruled notebook lines. The 28px rhythm has to match the text line-height
-   or the writing drifts off the lines as a note gets longer. */
-@utility ruled {
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0 27px,
-    var(--rule) 27px 28px
-  );
 }
 
 @utility desk-glow {
@@ -135,72 +67,6 @@ body {
   background-color: var(--paper);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
-}
-
-/* TipTap renders into a contenteditable it owns, so its children can't be
-   styled with utility classes from JSX. */
-@layer components {
-  .note-prose {
-    line-height: 28px;
-  }
-
-  .note-prose:focus {
-    outline: none;
-  }
-
-  .note-prose > * {
-    margin: 0 0 28px;
-  }
-
-  .note-prose h1,
-  .note-prose h2,
-  .note-prose h3 {
-    font-family: var(--font-serif);
-    font-weight: 500;
-    line-height: 28px;
-  }
-
-  .note-prose h1 {
-    font-size: 1.5rem;
-  }
-
-  .note-prose h2 {
-    font-size: 1.25rem;
-  }
-
-  .note-prose ul,
-  .note-prose ol {
-    padding-left: 24px;
-  }
-
-  .note-prose ul {
-    list-style: disc;
-  }
-
-  .note-prose ol {
-    list-style: decimal;
-  }
-
-  .note-prose blockquote {
-    padding-left: 16px;
-    border-left: 3px solid var(--accent);
-    color: var(--ink-soft);
-  }
-
-  .note-prose code {
-    padding: 1px 5px;
-    border-radius: 4px;
-    background: color-mix(in srgb, var(--ink) 8%, transparent);
-    font-size: 0.9em;
-  }
-
-  .note-prose p.is-editor-empty:first-child::before {
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    color: var(--ink-faint);
-    pointer-events: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
