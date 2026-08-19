@@ -46,7 +46,7 @@ async function toError(response: Response): Promise<ApiError> {
   try {
     body = (await response.json()) as ErrorBody;
   } catch {
-    // A proxy or a crash can return a non-JSON body; fall back to the status text.
+    // not json
   }
 
   return new ApiError(
@@ -67,10 +67,6 @@ function send(path: string, init: RequestInit, accessToken?: string): Promise<Re
   });
 }
 
-/**
- * Sends an authenticated request. On a 401 it tries the refresh token once and
- * replays the original request, so a expired access token is invisible to callers.
- */
 async function authed<T>(path: string, init: RequestInit = {}): Promise<T> {
   const session = readSession();
 
@@ -132,8 +128,7 @@ export async function logout(): Promise<void> {
   try {
     await authed<void>('/auth/logout', { method: 'POST' });
   } catch {
-    // The token may already be gone or expired. Clearing it locally is what
-    // actually signs the user out, so a failed call should not block that.
+    // ignore
   } finally {
     writeSession(null);
   }

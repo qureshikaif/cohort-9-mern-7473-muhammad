@@ -1,5 +1,3 @@
-// Drawn inline rather than shipped as an image so it inherits the theme
-// colours and switches with the dark scheme for free.
 export function NotebookArt({ className = '' }: { className?: string }) {
   const rings = [0, 1, 2, 3, 4, 5, 6];
   const ruleLines = [0, 1, 2, 3, 4, 5];
@@ -16,7 +14,6 @@ export function NotebookArt({ className = '' }: { className?: string }) {
       aria-label="An open notebook with a pencil and sticky notes"
       className={`w-full ${className}`}
     >
-      {/* sticky notes, drifting at different rates so they never look paired */}
       <g className="animate-float origin-center" style={{ animationDelay: '0ms' }}>
         <rect
           x="24"
@@ -30,7 +27,7 @@ export function NotebookArt({ className = '' }: { className?: string }) {
         <path
           d="M42 88 h50 M42 104 h50 M42 120 h32"
           transform="rotate(-8 68 98)"
-          className="stroke-accent/45"
+          className="stroke-accent/40"
           strokeWidth="2"
           strokeLinecap="round"
         />
@@ -55,7 +52,6 @@ export function NotebookArt({ className = '' }: { className?: string }) {
         />
       </g>
 
-      {/* a coffee ring, because the desk has seen some use */}
       <circle
         cx="352"
         cy="338"
@@ -65,13 +61,11 @@ export function NotebookArt({ className = '' }: { className?: string }) {
         strokeWidth="5"
       />
 
-      {/* the notebook */}
       <ellipse cx="210" cy="332" rx="152" ry="13" className="fill-ink/10" />
       <rect x="52" y="110" width="316" height="216" rx="9" className="fill-accent/20" />
       <rect x="58" y="116" width="150" height="202" rx="4" className="fill-sheet stroke-edge" />
       <rect x="212" y="116" width="150" height="202" rx="4" className="fill-sheet stroke-edge" />
 
-      {/* ruled lines and the margin rule on the right page */}
       <path
         d={ruleLines.map((i) => `M226 ${152 + i * 28} h124`).join(' ')}
         className="stroke-rule"
@@ -79,7 +73,6 @@ export function NotebookArt({ className = '' }: { className?: string }) {
       />
       <path d="M238 122 v190" className="stroke-margin-line/70" strokeWidth="2" />
 
-      {/* handwriting that draws itself on, one line after the next */}
       {written.map((line) => (
         <path
           key={line.d}
@@ -94,7 +87,6 @@ export function NotebookArt({ className = '' }: { className?: string }) {
         />
       ))}
 
-      {/* spiral binding */}
       {rings.map((i) => (
         <ellipse
           key={i}
@@ -108,7 +100,6 @@ export function NotebookArt({ className = '' }: { className?: string }) {
         />
       ))}
 
-      {/* pencil resting across the corner */}
       <g transform="rotate(-19 300 330)" className="animate-sway origin-center">
         <rect x="238" y="324" width="104" height="13" rx="2" className="fill-accent" />
         <rect x="342" y="324" width="14" height="13" rx="2" className="fill-ink-faint" />
@@ -117,7 +108,6 @@ export function NotebookArt({ className = '' }: { className?: string }) {
         <path d="M224 328.5 l-6 2 l6 2 z" className="fill-ink" />
       </g>
 
-      {/* paperclip on the top edge */}
       <path
         d="M96 108 v-24 a9 9 0 0 1 18 0 v30 a15 15 0 0 1 -30 0 v-26"
         fill="none"

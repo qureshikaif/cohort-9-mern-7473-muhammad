@@ -39,7 +39,7 @@ export function RegisterPage() {
   return (
     <AuthLayout
       title="Start a notebook"
-      lede="It takes about ten seconds."
+      subtitle="It takes about ten seconds."
       onSubmit={handleSubmit}
       footer={<>Already have one? <Link to="/login">Sign in</Link></>}
     >
@@ -78,7 +78,7 @@ export function RegisterPage() {
       />
 
       <Button type="submit" variant="primary" disabled={busy} className="mt-2 w-full">
-        {busy ? 'Creating…' : 'Create account'}
+        {busy ? 'Creating...' : 'Create account'}
       </Button>
     </AuthLayout>
   );

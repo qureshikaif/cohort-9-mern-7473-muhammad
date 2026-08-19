@@ -33,7 +33,7 @@ export function LoginPage() {
   return (
     <AuthLayout
       title="Welcome back"
-      lede="Pick up where you left off."
+      subtitle="Pick up where you left off."
       onSubmit={handleSubmit}
       footer={<>No account yet? <Link to="/register">Create one</Link></>}
     >
@@ -60,7 +60,7 @@ export function LoginPage() {
       />
 
       <Button type="submit" variant="primary" disabled={busy} className="mt-2 w-full">
-        {busy ? 'Signing in…' : 'Sign in'}
+        {busy ? 'Signing in...' : 'Sign in'}
       </Button>
     </AuthLayout>
   );
