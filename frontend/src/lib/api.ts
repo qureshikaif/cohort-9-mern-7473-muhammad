@@ -4,6 +4,8 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? '/api';
 
 const STORAGE_KEY = 'notes-app.session';
 
+const TIMEOUT_MS = 15000;
+
 export class ApiError extends Error {
   readonly status: number;
   readonly fieldErrors: Record<string, string[]>;
@@ -59,6 +61,7 @@ async function toError(response: Response): Promise<ApiError> {
 function send(path: string, init: RequestInit, accessToken?: string): Promise<Response> {
   return fetch(`${BASE_URL}${path}`, {
     ...init,
+    signal: init.signal ?? AbortSignal.timeout(TIMEOUT_MS),
     headers: {
       'Content-Type': 'application/json',
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
@@ -96,14 +99,18 @@ async function authed<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 async function tryRefresh(refreshToken: string): Promise<Session | null> {
-  const response = await send('/auth/refresh', {
-    method: 'POST',
-    body: JSON.stringify({ refreshToken }),
-  });
+  try {
+    const response = await send('/auth/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refreshToken }),
+    });
 
-  if (!response.ok) return null;
+    if (!response.ok) return null;
 
-  return (await response.json()) as Session;
+    return (await response.json()) as Session;
+  } catch {
+    return null;
+  }
 }
 
 async function guest<T>(path: string, body: unknown): Promise<T> {

@@ -19,7 +19,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
-    await api.logout();
+    try {
+      await api.logout();
+    } catch {
+      // ignore
+    }
+
     setUser(null);
   }
 

@@ -115,8 +115,9 @@ body {
     line-height: 28px;
   }
 
-  .note-prose:focus {
-    outline: none;
+  .note-prose:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
   }
 
   .note-prose > * {
