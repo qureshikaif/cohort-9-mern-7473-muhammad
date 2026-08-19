@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 400" role="img" aria-label="An open notebook with a pencil and sticky notes">
+  <style>
+    svg {
+      --paper: #fbf7ef;
+      --sheet: #fffdf8;
+      --ink: #262320;
+      --ink-soft: #6b6459;
+      --ink-faint: #a89e8f;
+      --edge: #e6dcc9;
+      --rule: #d9e3ef;
+      --margin-line: #e2a9a0;
+      --accent: #b4573f;
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --paper: #14161a;
+        --sheet: #1c1f25;
+        --ink: #e9e4d9;
+        --ink-soft: #a29c90;
+        --ink-faint: #6d6862;
+        --edge: #2a2e36;
+        --rule: #2b323d;
+        --margin-line: #7d4a44;
+        --accent: #e08163;
+      }
+    }
+
+    .sticky-a { fill: var(--accent); fill-opacity: .25; stroke: var(--accent); stroke-opacity: .3 }
+    .sticky-a-lines { stroke: var(--accent); stroke-opacity: .4 }
+    .sticky-b { fill: var(--rule); fill-opacity: .6; stroke: var(--edge) }
+    .sticky-b-lines { stroke: var(--ink-faint); stroke-opacity: .7 }
+    .coffee { stroke: var(--accent); stroke-opacity: .2 }
+    .shadow { fill: var(--ink); fill-opacity: .1 }
+    .cover { fill: var(--accent); fill-opacity: .2 }
+    .page { fill: var(--sheet); stroke: var(--edge) }
+    .rules { stroke: var(--rule) }
+    .margin { stroke: var(--margin-line); stroke-opacity: .7 }
+    .ring { fill: none; stroke: var(--ink-faint) }
+    .clip { fill: none; stroke: var(--ink-faint) }
+    .pencil-body { fill: var(--accent) }
+    .pencil-ferrule { fill: var(--ink-faint) }
+    .pencil-eraser { fill: var(--margin-line) }
+    .pencil-wood { fill: var(--paper); stroke: var(--ink-faint) }
+    .pencil-tip { fill: var(--ink) }
+
+    .writing {
+      fill: none;
+      stroke: var(--ink-soft);
+      stroke-opacity: .7;
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+      animation: draw 2.4s var(--ease) forwards;
+    }
+
+    .float { animation: float 7s ease-in-out infinite; transform-origin: center }
+    .sway { animation: sway 9s ease-in-out infinite; transform-origin: center }
+
+    @keyframes draw { to { stroke-dashoffset: 0 } }
+    @keyframes float { 50% { transform: translateY(-9px) } }
+    @keyframes sway { 50% { transform: rotate(2.5deg) } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .float, .sway { animation: none }
+      .writing { animation-duration: .01ms }
+    }
+  </style>
+
+  <!-- sticky notes, drifting at different rates -->
+  <g class="float">
+    <rect x="24" y="54" width="88" height="88" rx="3" transform="rotate(-8 68 98)" class="sticky-a" />
+    <path d="M42 88 h50 M42 104 h50 M42 120 h32" transform="rotate(-8 68 98)" class="sticky-a-lines" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <g class="float" style="animation-delay: 1800ms">
+    <rect x="316" y="40" width="74" height="74" rx="3" transform="rotate(7 353 77)" class="sticky-b" />
+    <path d="M332 66 h42 M332 80 h42 M332 94 h26" transform="rotate(7 353 77)" class="sticky-b-lines" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- coffee ring -->
+  <circle cx="352" cy="338" r="28" fill="none" class="coffee" stroke-width="5" />
+
+  <!-- the notebook: shadow, cover, two pages -->
+  <ellipse cx="210" cy="332" rx="152" ry="13" class="shadow" />
+  <rect x="52" y="110" width="316" height="216" rx="9" class="cover" />
+  <rect x="58" y="116" width="150" height="202" rx="4" class="page" />
+  <rect x="212" y="116" width="150" height="202" rx="4" class="page" />
+
+  <!-- ruled lines and the margin rule on the right page -->
+  <path d="M226 152 h124 M226 180 h124 M226 208 h124 M226 236 h124 M226 264 h124 M226 292 h124" class="rules" stroke-width="2" />
+  <path d="M238 122 v190" class="margin" stroke-width="2" />
+
+  <!-- handwriting that draws itself on, one line after the next -->
+  <path d="M78 176 q16 -9 32 0 t32 0 t32 0" class="writing" stroke-width="3" stroke-linecap="round" style="animation-delay: 500ms" />
+  <path d="M78 212 q16 -9 32 0 t32 0 t20 -2" class="writing" stroke-width="3" stroke-linecap="round" style="animation-delay: 900ms" />
+  <path d="M78 248 q16 -9 32 0 t24 -1" class="writing" stroke-width="3" stroke-linecap="round" style="animation-delay: 1300ms" />
+
+  <!-- spiral binding -->
+  <ellipse cx="210" cy="138" rx="10" ry="5.5" class="ring" stroke-width="2.5" />
+  <ellipse cx="210" cy="166" rx="10" ry="5.5" class="ring" stroke-width="2.5" />
+  <ellipse cx="210" cy="194" rx="10" ry="5.5" class="ring" stroke-width="2.5" />
+  <ellipse cx="210" cy="222" rx="10" ry="5.5" class="ring" stroke-width="2.5" />
+  <ellipse cx="210" cy="250" rx="10" ry="5.5" class="ring" stroke-width="2.5" />
+  <ellipse cx="210" cy="278" rx="10" ry="5.5" class="ring" stroke-width="2.5" />
+  <ellipse cx="210" cy="306" rx="10" ry="5.5" class="ring" stroke-width="2.5" />
+
+  <!-- pencil resting across the corner -->
+  <g transform="rotate(-19 300 330)" class="sway">
+    <rect x="238" y="324" width="104" height="13" rx="2" class="pencil-body" />
+    <rect x="342" y="324" width="14" height="13" rx="2" class="pencil-ferrule" />
+    <rect x="356" y="325" width="10" height="11" rx="2" class="pencil-eraser" />
+    <path d="M238 324 l-20 6.5 l20 6.5 z" class="pencil-wood" stroke-width="1.5" />
+    <path d="M224 328.5 l-6 2 l6 2 z" class="pencil-tip" />
+  </g>
+
+  <!-- paperclip on the top edge -->
+  <path d="M96 108 v-24 a9 9 0 0 1 18 0 v30 a15 15 0 0 1 -30 0 v-26" class="clip" stroke-width="3" stroke-linecap="round" />
+</svg>
