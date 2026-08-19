@@ -61,7 +61,11 @@ export function Alert({ children }: { children: ReactNode }) {
 
 export function Spinner({ label }: { label?: string }) {
   return (
-    <div className="grid place-items-center gap-3 py-20 text-ink-soft">
+    <div
+      role="status"
+      aria-label={label ?? 'Loading'}
+      className="grid place-items-center gap-3 py-20 text-ink-soft"
+    >
       <div className="size-5 animate-spin rounded-full border-2 border-ink/20 border-t-accent" />
       {label ? <p className="text-sm">{label}</p> : null}
     </div>
