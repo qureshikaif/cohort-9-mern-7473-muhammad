@@ -1,10 +1,25 @@
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { AppShell } from './components/AppShell';
+import { ProtectedRoute } from './auth/ProtectedRoute';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+
 export default function App() {
   return (
-    <div className="desk-glow grid min-h-screen place-items-center px-5">
-      <div className="w-full max-w-100 rounded-xs border border-edge bg-sheet px-8 py-9 shadow-lg">
-        <h1 className="mb-1 font-serif text-3xl font-medium">Notes</h1>
-        <p className="text-sm text-ink-soft">The screens arrive in the next PR.</p>
-      </div>
-    </div>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppShell />}>
+          <Route
+            index
+            element={<p className="text-sm text-ink-soft">Your notes will appear here.</p>}
+          />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
