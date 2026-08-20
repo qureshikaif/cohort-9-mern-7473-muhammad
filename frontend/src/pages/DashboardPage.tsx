@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listNotes } from '../lib/api';
 import type { Note } from '../lib/types';
@@ -13,22 +13,29 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const load = useCallback(async (term: string) => {
-    try {
-      const result = await listNotes(term);
-      setNotes(result.items);
-      setError('');
-    } catch {
-      setError('Could not load your notes. Is the API running?');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    const timer = setTimeout(() => void load(search), search ? 300 : 0);
-    return () => clearTimeout(timer);
-  }, [search, load]);
+    let cancelled = false;
+
+    const timer = setTimeout(() => {
+      listNotes(search)
+        .then((result) => {
+          if (cancelled) return;
+          setNotes(result.items);
+          setError('');
+        })
+        .catch(() => {
+          if (!cancelled) setError('Could not load your notes. Is the API running?');
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, search ? 300 : 0);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [search]);
 
   return (
     <>

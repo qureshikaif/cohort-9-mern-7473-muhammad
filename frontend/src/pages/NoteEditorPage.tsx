@@ -11,7 +11,8 @@ export function NoteEditorPage() {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(!isNew);
+  const [loadedId, setLoadedId] = useState<string>();
+  const [failed, setFailed] = useState<{ id: string; message: string }>();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -25,20 +26,21 @@ export function NoteEditorPage() {
         if (cancelled) return;
         setTitle(note.title);
         setContent(note.content);
+        setLoadedId(id);
       })
       .catch((cause: unknown) => {
-        if (!cancelled) {
-          setError(cause instanceof ApiError ? cause.message : 'Could not load this note');
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (cancelled) return;
+        const message = cause instanceof ApiError ? cause.message : 'Could not load this note';
+        setFailed({ id, message });
       });
 
     return () => {
       cancelled = true;
     };
   }, [id, isNew]);
+
+  const loadFailed = !isNew && failed?.id === id;
+  const loading = !isNew && !loadFailed && loadedId !== id;
 
   async function handleSave() {
     if (!title.trim()) {
@@ -75,6 +77,17 @@ export function NoteEditorPage() {
 
   if (loading) {
     return <Spinner label="Finding your note..." />;
+  }
+
+  if (loadFailed) {
+    return (
+      <>
+        <Alert>{failed?.message ?? 'Could not load this note'}</Alert>
+        <Button variant="ghost" onClick={() => navigate('/')}>
+          Back to notes
+        </Button>
+      </>
+    );
   }
 
   return (
