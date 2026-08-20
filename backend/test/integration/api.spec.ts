@@ -166,7 +166,7 @@ describe('api (integration)', () => {
     expect(body.success).to.equal(false);
   });
 
-  it('returns the signed-in user profile with a note count', async () => {
+  it('gives back the profile with a note count', async () => {
     const token = await signUp('kaif@example.com');
     await call('POST', '/api/notes', { token, body: { title: 'One', content: '' } });
     await call('POST', '/api/notes', { token, body: { title: 'Two', content: '' } });
@@ -181,7 +181,7 @@ describe('api (integration)', () => {
     expect(profile.password).to.equal(undefined);
   });
 
-  it('refuses the profile endpoint without a token', async () => {
+  it('profile needs a token', async () => {
     expect((await call('GET', '/api/users/me')).status).to.equal(401);
   });
 });

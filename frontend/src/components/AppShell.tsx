@@ -25,7 +25,7 @@ export function AppShell() {
           <>
             <Link
               to="/profile"
-              className="hidden rounded-md px-2 py-1 text-sm text-ink-soft no-underline transition-colors duration-150 hover:bg-ink/6 hover:text-ink sm:inline"
+              className="hidden rounded-md px-2 py-1 text-sm text-ink-soft no-underline transition-colors duration-150 hover:bg-ink/5 hover:text-ink sm:inline"
             >
               {user.name}
             </Link>
