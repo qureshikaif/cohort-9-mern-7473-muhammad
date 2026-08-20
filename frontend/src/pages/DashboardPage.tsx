@@ -28,14 +28,11 @@ export function DashboardPage() {
     }
   }, []);
 
-  // Debounced so typing in the search box doesn't fire a request per keystroke.
   useEffect(() => {
     const timer = setTimeout(() => void load(search), search ? 300 : 0);
     return () => clearTimeout(timer);
   }, [search, load]);
 
-  // Applied to the list in place rather than refetching, so another tab's edit
-  // does not wipe out whatever the user is searching for here.
   const handlers = useMemo(
     () => ({
       onCreated: (note: Note) => {
@@ -80,7 +77,7 @@ export function DashboardPage() {
           type="search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search notes…"
+          placeholder="Search notes..."
           aria-label="Search notes"
           className="w-full rounded-full border border-edge bg-sheet px-3.5 py-2 transition-shadow duration-150 ease-paper focus:border-accent focus:ring-3 focus:ring-accent-soft focus:outline-none sm:w-70"
         />
@@ -95,7 +92,7 @@ export function DashboardPage() {
       ) : null}
 
       {loading ? (
-        <Spinner label="Opening your notebook…" />
+        <Spinner label="Opening your notebook..." />
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-5">
           <button
@@ -120,7 +117,7 @@ export function DashboardPage() {
 
       {!loading && notes.length === 0 && search ? (
         <p className="py-10 text-center text-sm text-ink-soft">
-          Nothing matches “{search}”.
+          Nothing matches "{search}".
         </p>
       ) : null}
     </>

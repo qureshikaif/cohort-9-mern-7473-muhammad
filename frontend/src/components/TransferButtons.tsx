@@ -7,10 +7,6 @@ interface ImportedNote {
   content?: unknown;
 }
 
-/**
- * Pulls notes out of a parsed file. Accepts either an export from this app,
- * which wraps them in an object, or a bare array, so a hand-written file works.
- */
 function readNotes(parsed: unknown): { title: string; content: string }[] {
   const raw = Array.isArray(parsed) ? parsed : ((parsed as { notes?: unknown })?.notes ?? []);
 
@@ -55,7 +51,6 @@ export function TransferButtons({ onImported, onError }: Props) {
       link.download = `notes-${payload.exportedAt.slice(0, 10)}.json`;
       link.click();
 
-      // Released straight away; the browser has already read the blob.
       URL.revokeObjectURL(url);
     } catch {
       onError('Could not export your notes');
@@ -75,7 +70,6 @@ export function TransferButtons({ onImported, onError }: Props) {
       onError(cause instanceof Error ? cause.message : 'Could not read that file');
     } finally {
       setBusy(null);
-      // Cleared so choosing the same file twice fires change again.
       if (fileInput.current) fileInput.current.value = '';
     }
   }
@@ -83,7 +77,7 @@ export function TransferButtons({ onImported, onError }: Props) {
   return (
     <div className="flex gap-2">
       <Button variant="ghost" onClick={handleExport} disabled={busy !== null}>
-        {busy === 'export' ? 'Exporting…' : 'Export'}
+        {busy === 'export' ? 'Exporting...' : 'Export'}
       </Button>
 
       <Button
@@ -91,7 +85,7 @@ export function TransferButtons({ onImported, onError }: Props) {
         onClick={() => fileInput.current?.click()}
         disabled={busy !== null}
       >
-        {busy === 'import' ? 'Importing…' : 'Import'}
+        {busy === 'import' ? 'Importing...' : 'Import'}
       </Button>
 
       <input

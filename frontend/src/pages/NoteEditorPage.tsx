@@ -74,7 +74,7 @@ export function NoteEditorPage() {
   }
 
   if (loading) {
-    return <Spinner label="Finding your note…" />;
+    return <Spinner label="Finding your note..." />;
   }
 
   return (
@@ -93,7 +93,7 @@ export function NoteEditorPage() {
 
       <div className="mt-5 flex items-center gap-2.5 border-t border-edge pt-4">
         <Button variant="primary" onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving…' : 'Save note'}
+          {saving ? 'Saving...' : 'Save note'}
         </Button>
 
         <Button variant="ghost" onClick={() => navigate('/')} disabled={saving}>

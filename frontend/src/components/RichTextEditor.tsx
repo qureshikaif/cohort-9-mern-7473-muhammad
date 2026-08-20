@@ -68,7 +68,7 @@ interface Props {
 
 export function RichTextEditor({ value, onChange }: Props) {
   const editor = useEditor({
-    extensions: [StarterKit, Placeholder.configure({ placeholder: 'Start writing…' })],
+    extensions: [StarterKit, Placeholder.configure({ placeholder: 'Start writing...' })],
     content: value,
     onUpdate: ({ editor: current }) => onChange(current.getHTML()),
     editorProps: {
@@ -76,8 +76,6 @@ export function RichTextEditor({ value, onChange }: Props) {
     },
   });
 
-  // An existing note's content arrives after the first render, so push it in
-  // once it differs. Typing is unaffected because onUpdate keeps the two in sync.
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value, { emitUpdate: false });

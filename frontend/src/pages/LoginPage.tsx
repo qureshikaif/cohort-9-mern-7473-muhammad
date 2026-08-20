@@ -60,7 +60,7 @@ export function LoginPage() {
       />
 
       <Button type="submit" variant="primary" disabled={busy} className="mt-2 w-full">
-        {busy ? 'Signing in…' : 'Sign in'}
+        {busy ? 'Signing in...' : 'Sign in'}
       </Button>
     </AuthLayout>
   );

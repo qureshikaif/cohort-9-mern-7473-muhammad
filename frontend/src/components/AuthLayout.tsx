@@ -13,7 +13,6 @@ export function AuthLayout({ title, lede, onSubmit, children, footer }: Props) {
   return (
     <div className="desk-glow min-h-screen lg:grid lg:grid-cols-[1.05fr_1fr]">
       <aside className="relative hidden overflow-hidden border-r border-edge px-12 lg:grid lg:place-items-center">
-        {/* faint dotted grid, like a desk blotter */}
         <div className="pointer-events-none absolute inset-0 opacity-50 [background-image:radial-gradient(var(--edge)_1px,transparent_1px)] [background-size:22px_22px]" />
 
         <div className="relative max-w-125">

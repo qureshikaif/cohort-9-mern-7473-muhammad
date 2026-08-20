@@ -8,8 +8,6 @@ export interface AuthValue {
   signOut: () => Promise<void>;
 }
 
-// Kept out of AuthProvider.tsx so that file only exports a component, which is
-// what Fast Refresh needs to hot-reload it.
 export const AuthContext = createContext<AuthValue | null>(null);
 
 export function useAuth(): AuthValue {

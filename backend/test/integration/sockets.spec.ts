@@ -11,8 +11,6 @@ interface NotePayload {
   title?: string;
 }
 
-// Waits for one event, or resolves null if nothing arrives. The null case is
-// what proves a user does NOT receive somebody else's note.
 function nextEvent(socket: Socket, event: string, ms = 1500): Promise<NotePayload | null> {
   return new Promise((resolve) => {
     const timer = setTimeout(() => resolve(null), ms);
@@ -65,7 +63,7 @@ describe('socket note events (integration)', () => {
     });
   }
 
-  it('refuses a connection with no token', async () => {
+  it('no token means no connection', async () => {
     const failure = await new Promise<string>((resolve) => {
       const socket = connect(url, { transports: ['websocket'] });
       socket.on('connect_error', (error: Error) => {
@@ -77,7 +75,7 @@ describe('socket note events (integration)', () => {
     expect(failure).to.contain('Authentication token required');
   });
 
-  it('refuses a connection with a bad token', async () => {
+  it('a bad token is refused', async () => {
     const failure = await new Promise<string>((resolve) => {
       const socket = connect(url, { auth: { token: 'nonsense' }, transports: ['websocket'] });
       socket.on('connect_error', (error: Error) => {
@@ -89,7 +87,7 @@ describe('socket note events (integration)', () => {
     expect(failure).to.contain('Invalid or expired token');
   });
 
-  it('delivers note:created to the author', async () => {
+  it('the author gets note:created', async () => {
     const { accessToken } = await createUser();
     const socket = await connectAs(url, accessToken);
 
@@ -102,7 +100,7 @@ describe('socket note events (integration)', () => {
     expect(note?.title).to.equal('Written elsewhere');
   });
 
-  it('delivers note:deleted with the id', async () => {
+  it('note:deleted carries the id', async () => {
     const { accessToken } = await createUser();
     const socket = await connectAs(url, accessToken);
 
@@ -118,7 +116,7 @@ describe('socket note events (integration)', () => {
     expect((await received)?.id).to.equal(note.id);
   });
 
-  it('never delivers one user note to another user socket', async () => {
+  it('one user does not get another users note', async () => {
     const mine = await createUser();
     const theirs = await createUser();
 

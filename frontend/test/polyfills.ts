@@ -1,5 +1,4 @@
 import { TextDecoder, TextEncoder } from 'node:util';
 
-// jsdom ships neither, and react-router reads TextEncoder while it is being
-// imported. This runs in setupFiles so it lands before any test module loads.
+// jsdom has neither and react-router needs TextEncoder on import
 Object.assign(globalThis, { TextEncoder, TextDecoder });

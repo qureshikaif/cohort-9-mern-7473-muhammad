@@ -49,7 +49,7 @@ export function ProfilePage() {
   }
 
   if (error) return <Alert>{error}</Alert>;
-  if (!profile) return <Spinner label="Fetching your details…" />;
+  if (!profile) return <Spinner label="Fetching your details..." />;
 
   const initials = profile.name
     .split(' ')

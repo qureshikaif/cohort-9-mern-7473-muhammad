@@ -13,8 +13,7 @@ router.use(authenticate);
 router.post('/', validateBody(createNoteSchema), asyncHandler(create));
 router.get('/', asyncHandler(list));
 
-// Registered before /:id, otherwise Express matches "export" as an id and the
-// uuid check rejects it with a 400.
+// must come before /:id or express treats "export" as an id
 router.get('/export', asyncHandler(exportAll));
 router.post('/import', validateBody(importSchema), asyncHandler(importAll));
 

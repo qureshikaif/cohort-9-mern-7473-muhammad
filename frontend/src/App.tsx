@@ -8,8 +8,6 @@ import { ProfilePage } from './pages/ProfilePage';
 import { RegisterPage } from './pages/RegisterPage';
 import { Spinner } from './components/ui';
 
-// The rich text editor pulls in TipTap and ProseMirror, which is most of the
-// bundle. Loading it only when a note is opened keeps the first paint small.
 const NoteEditorPage = lazy(() =>
   import('./pages/NoteEditorPage').then((m) => ({ default: m.NoteEditorPage }))
 );
@@ -27,7 +25,7 @@ export default function App() {
           <Route
             path="notes/new"
             element={
-              <Suspense fallback={<Spinner label="Sharpening a pencil…" />}>
+              <Suspense fallback={<Spinner label="Sharpening a pencil..." />}>
                 <NoteEditorPage />
               </Suspense>
             }
@@ -35,7 +33,7 @@ export default function App() {
           <Route
             path="notes/:id"
             element={
-              <Suspense fallback={<Spinner label="Finding your note…" />}>
+              <Suspense fallback={<Spinner label="Finding your note..." />}>
                 <NoteEditorPage />
               </Suspense>
             }

@@ -78,7 +78,7 @@ export function RegisterPage() {
       />
 
       <Button type="submit" variant="primary" disabled={busy} className="mt-2 w-full">
-        {busy ? 'Creating…' : 'Create account'}
+        {busy ? 'Creating...' : 'Create account'}
       </Button>
     </AuthLayout>
   );
