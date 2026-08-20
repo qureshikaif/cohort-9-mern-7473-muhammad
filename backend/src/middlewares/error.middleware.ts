@@ -18,6 +18,9 @@ export function errorHandler(
     statusCode = err.statusCode;
     message = err.message;
     details = err.details;
+  } else if (err instanceof SyntaxError && 'body' in err) {
+    statusCode = 400;
+    message = 'The request body is not valid JSON';
   } else if (err instanceof ZodError) {
     statusCode = 400;
     message = 'Validation failed';
