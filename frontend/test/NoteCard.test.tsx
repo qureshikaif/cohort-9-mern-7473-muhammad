@@ -18,14 +18,14 @@ describe('NoteCard', () => {
     expect(screen.getByText('Shopping list')).toBeInTheDocument();
   });
 
-  it('renders the preview as plain text so stored HTML cannot inject markup', () => {
+  it('shows the preview as plain text', () => {
     render(<NoteCard note={note} index={0} onOpen={() => {}} />);
 
     expect(screen.getByText(/Milk and bread/)).toBeInTheDocument();
     expect(document.querySelector('strong')).toBeNull();
   });
 
-  it('does not execute markup hidden in a note', () => {
+  it('does not render html from a note', () => {
     const hostile: Note = { ...note, content: '<img src=x onerror="alert(1)">stay calm' };
     render(<NoteCard note={hostile} index={0} onOpen={() => {}} />);
 
@@ -33,7 +33,7 @@ describe('NoteCard', () => {
     expect(screen.getByText(/stay calm/)).toBeInTheDocument();
   });
 
-  it('falls back to a placeholder when the note is empty', () => {
+  it('empty note shows a placeholder', () => {
     render(<NoteCard note={{ ...note, content: '<p></p>' }} index={0} onOpen={() => {}} />);
 
     expect(screen.getByText('Empty note')).toBeInTheDocument();

@@ -1,4 +1,4 @@
-// Only used by Jest. Vite compiles the app with esbuild and never reads this.
+// jest only, vite uses esbuild
 module.exports = {
   presets: [
     ['@babel/preset-env', { targets: { node: 'current' } }],
