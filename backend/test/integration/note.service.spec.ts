@@ -38,7 +38,7 @@ describe('note service (integration)', () => {
       expect(result.items[0]?.title).to.equal('Mine');
     });
 
-    it('reports another user note as 404 rather than 403', async () => {
+    it('another users note gives 404', async () => {
       const mine = await createUser();
       const theirs = await createUser();
       const note = await createNote(theirs.user.id, { title: 'Theirs', content: '' });
@@ -46,7 +46,7 @@ describe('note service (integration)', () => {
       expect(await statusFrom(() => getNote(mine.user.id, note.id))).to.equal(404);
     });
 
-    it('refuses an update from a non-owner and leaves the note untouched', async () => {
+    it('a non owner cannot update', async () => {
       const mine = await createUser();
       const theirs = await createUser();
       const note = await createNote(theirs.user.id, { title: 'Theirs', content: '' });
@@ -59,7 +59,7 @@ describe('note service (integration)', () => {
       expect((await getNote(theirs.user.id, note.id)).title).to.equal('Theirs');
     });
 
-    it('refuses a delete from a non-owner and leaves the note in place', async () => {
+    it('a non owner cannot delete', async () => {
       const mine = await createUser();
       const theirs = await createUser();
       const note = await createNote(theirs.user.id, { title: 'Theirs', content: '' });
@@ -70,7 +70,7 @@ describe('note service (integration)', () => {
   });
 
   describe('updating and deleting', () => {
-    it('applies a partial update and leaves the other field alone', async () => {
+    it('a partial update keeps the other field', async () => {
       const { user } = await createUser();
       const note = await createNote(user.id, { title: 'Draft', content: '<p>body</p>' });
 
@@ -80,7 +80,7 @@ describe('note service (integration)', () => {
       expect(updated.content).to.equal('<p>body</p>');
     });
 
-    it('removes the note for its owner', async () => {
+    it('the owner can delete', async () => {
       const { user } = await createUser();
       const note = await createNote(user.id, { title: 'Temporary', content: '' });
 
@@ -89,7 +89,7 @@ describe('note service (integration)', () => {
       expect(await statusFrom(() => getNote(user.id, note.id))).to.equal(404);
     });
 
-    it('reports 404 for an id that does not exist', async () => {
+    it('an unknown id gives 404', async () => {
       const { user } = await createUser();
       const missing = '3f0c1e5a-9b8d-4c7e-8f2a-1d6b5c4e3a20';
 
@@ -98,7 +98,7 @@ describe('note service (integration)', () => {
   });
 
   describe('listing', () => {
-    it('matches the search term against title and content, ignoring case', async () => {
+    it('search looks at title and content', async () => {
       const { user } = await createUser();
       await createNote(user.id, { title: 'Sprint planning', content: '' });
       await createNote(user.id, { title: 'Recipe', content: '<p>Needs PLANNING ahead</p>' });
@@ -109,7 +109,7 @@ describe('note service (integration)', () => {
       expect(result.total).to.equal(2);
     });
 
-    it('paginates and reports the unpaginated total', async () => {
+    it('pagination reports the total', async () => {
       const { user } = await createUser();
       for (const title of ['one', 'two', 'three']) {
         await createNote(user.id, { title, content: '' });
@@ -121,7 +121,7 @@ describe('note service (integration)', () => {
       expect(page.total).to.equal(3);
     });
 
-    it('returns the most recently updated note first', async () => {
+    it('newest note comes first', async () => {
       const { user } = await createUser();
       const first = await createNote(user.id, { title: 'First', content: '' });
       await createNote(user.id, { title: 'Second', content: '' });
@@ -133,7 +133,7 @@ describe('note service (integration)', () => {
     });
   });
 
-  it('deletes a user notes along with the user', async () => {
+  it('deleting a user deletes their notes', async () => {
     const { user } = await createUser();
     await createNote(user.id, { title: 'Goes with me', content: '' });
 
