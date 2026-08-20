@@ -39,7 +39,7 @@ export function initSocket(httpServer: HttpServer): SocketServer {
     const userId = socket.user?.sub;
 
     if (userId) {
-      void socket.join(roomFor(userId));
+      socket.join(roomFor(userId));
     }
 
     logger.info(`Socket connected: ${socket.id} (user: ${userId ?? 'unknown'})`);
