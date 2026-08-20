@@ -11,7 +11,6 @@ interface AuthedSocket extends Socket {
 
 let io: SocketServer | undefined;
 
-/** Each user gets their own room, so a note is only ever sent to its owner. */
 function roomFor(userId: string): string {
   return `user:${userId}`;
 }
@@ -40,8 +39,6 @@ export function initSocket(httpServer: HttpServer): SocketServer {
     const userId = socket.user?.sub;
 
     if (userId) {
-      // Joined from the verified token rather than anything the client sends,
-      // so a connection cannot subscribe to someone else's notes.
       void socket.join(roomFor(userId));
     }
 
@@ -62,10 +59,6 @@ export function getIO(): SocketServer {
 
 export type NoteEvent = 'note:created' | 'note:updated' | 'note:deleted';
 
-/**
- * Tells a user's other open tabs what changed. Never throws: a websocket that
- * is down must not turn a successful write into a failed request.
- */
 export function emitToUser(userId: string, event: NoteEvent, payload: Note | { id: string }): void {
   try {
     io?.to(roomFor(userId)).emit(event, payload);

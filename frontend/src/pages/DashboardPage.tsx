@@ -31,8 +31,6 @@ export function DashboardPage() {
     return () => clearTimeout(timer);
   }, [search, load]);
 
-  // Applied to the list in place rather than refetching, so another tab's edit
-  // does not wipe out whatever the user is searching for here.
   const handlers = useMemo(
     () => ({
       onCreated: (note: Note) => {

@@ -10,11 +10,6 @@ export interface NoteEventHandlers {
   onDeleted: (id: string) => void;
 }
 
-/**
- * Keeps the open tab in step with edits made elsewhere. The server puts each
- * connection in a room keyed by the user in its token, so a socket only ever
- * receives that user's notes.
- */
 export function useNoteEvents(handlers: NoteEventHandlers): void {
   const { onCreated, onUpdated, onDeleted } = handlers;
 
@@ -24,8 +19,6 @@ export function useNoteEvents(handlers: NoteEventHandlers): void {
 
     const socket: Socket = io(SOCKET_URL, {
       auth: { token },
-      // The dashboard already loads over HTTP, so a failed upgrade should leave
-      // the page working rather than retrying forever.
       reconnectionAttempts: 5,
       transports: ['websocket', 'polling'],
     });
