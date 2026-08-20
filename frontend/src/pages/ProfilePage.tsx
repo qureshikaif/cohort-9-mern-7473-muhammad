@@ -49,7 +49,7 @@ export function ProfilePage() {
   }
 
   if (error) return <Alert>{error}</Alert>;
-  if (!profile) return <Spinner label="Fetching your details…" />;
+  if (!profile) return <Spinner label="Loading your profile..." />;
 
   const initials = profile.name
     .split(' ')
@@ -63,7 +63,7 @@ export function ProfilePage() {
 
       <div className="max-w-2xl animate-sheet-in rounded-xs border border-edge bg-sheet px-6 py-7 shadow-md sm:px-9">
         <div className="mb-6 flex items-center gap-4">
-          <span className="grid size-14 place-items-center rounded-full bg-accent/15 font-serif text-xl text-accent">
+          <span className="grid size-14 place-items-center rounded-full bg-accent/20 font-serif text-xl text-accent">
             {initials}
           </span>
           <div>

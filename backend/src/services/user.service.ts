@@ -19,8 +19,6 @@ export async function getProfile(userId: string): Promise<UserProfile> {
       email: true,
       role: true,
       createdAt: true,
-      // Counted by the database rather than by loading the notes, which would
-      // pull every row across the wire just to take its length.
       _count: { select: { notes: true } },
     },
   });
