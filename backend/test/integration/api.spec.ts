@@ -305,7 +305,19 @@ describe('api (integration)', () => {
       expect((await call('GET', '/api/notes/export', { token })).status).to.equal(200);
     });
 
-    it('export and import need a token', async () => {
+    it('a broken json body gives 400 not 500', async () => {
+    const token = await signUp('broken@example.com');
+
+    const response = await fetch(`${baseUrl}/api/notes/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: '{not json',
+    });
+
+    expect(response.status).to.equal(400);
+  });
+
+  it('export and import need a token', async () => {
       expect((await call('GET', '/api/notes/export')).status).to.equal(401);
       expect((await call('POST', '/api/notes/import', { body: { notes: [] } })).status).to.equal(
         401
