@@ -247,7 +247,7 @@ describe('api (integration)', () => {
   });
 
   describe('export and import', () => {
-    it('round-trips notes between two accounts', async () => {
+    it('export from one account imports into another', async () => {
       const source = await signUp('source@example.com');
       await call('POST', '/api/notes', {
         token: source,
@@ -260,7 +260,6 @@ describe('api (integration)', () => {
 
       const notes = exported.body.notes as Json[];
       expect(notes).to.have.lengthOf(1);
-      // Ids and the author are deliberately absent, they mean nothing elsewhere.
       expect(notes[0]?.id).to.equal(undefined);
       expect(notes[0]?.authorId).to.equal(undefined);
 
@@ -277,7 +276,7 @@ describe('api (integration)', () => {
       expect((listed.body.items as Json[])[0]?.title).to.equal('Kept');
     });
 
-    it('exports only the caller notes', async () => {
+    it('export only has your own notes', async () => {
       const mine = await signUp('mine@example.com');
       const theirs = await signUp('theirs@example.com');
       await call('POST', '/api/notes', { token: theirs, body: { title: 'Theirs', content: '' } });
@@ -287,7 +286,7 @@ describe('api (integration)', () => {
       expect(exported.body.notes as Json[]).to.have.lengthOf(0);
     });
 
-    it('rejects an import with no usable notes', async () => {
+    it('an import with no notes is rejected', async () => {
       const token = await signUp('kaif@example.com');
 
       const empty = await call('POST', '/api/notes/import', { token, body: { notes: [] } });
@@ -300,15 +299,13 @@ describe('api (integration)', () => {
       expect(untitled.status).to.equal(400);
     });
 
-    it('does not treat export as a note id', async () => {
+    it('the export route is not read as an id', async () => {
       const token = await signUp('kaif@example.com');
 
-      // /export is registered before /:id; if that order changed this would 400
-      // on the uuid check instead of returning a payload.
       expect((await call('GET', '/api/notes/export', { token })).status).to.equal(200);
     });
 
-    it('refuses both endpoints without a token', async () => {
+    it('export and import need a token', async () => {
       expect((await call('GET', '/api/notes/export')).status).to.equal(401);
       expect((await call('POST', '/api/notes/import', { body: { notes: [] } })).status).to.equal(
         401
