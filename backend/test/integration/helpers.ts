@@ -2,17 +2,14 @@ import { prisma } from '../../src/config/prisma.js';
 import { registerUser } from '../../src/services/auth.service.js';
 import type { AuthResult } from '../../src/services/auth.service.js';
 
-/**
- * Empties both tables between tests. CASCADE covers Note, but naming it keeps
- * the statement honest if the relation is ever changed.
- */
+// wipes both tables between tests
 export async function resetDatabase(): Promise<void> {
   await prisma.$executeRawUnsafe('TRUNCATE TABLE "Note", "User" RESTART IDENTITY CASCADE');
 }
 
 let counter = 0;
 
-/** Registers a user with a unique email so specs never collide. */
+// unique email each time so specs do not collide
 export function createUser(password = 'a-long-enough-password'): Promise<AuthResult> {
   counter += 1;
 
@@ -23,7 +20,6 @@ export function createUser(password = 'a-long-enough-password'): Promise<AuthRes
   });
 }
 
-/** Returns the ApiError status a rejected call produced, or undefined if it resolved. */
 export async function statusFrom(run: () => Promise<unknown>): Promise<number | undefined> {
   try {
     await run();

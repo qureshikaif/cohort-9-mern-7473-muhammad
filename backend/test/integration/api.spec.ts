@@ -8,9 +8,6 @@ interface Json {
   [key: string]: unknown;
 }
 
-// Drives the controllers through real HTTP against a real database, which the
-// service specs skip by calling the functions directly and the route specs skip
-// by only covering rejections.
 describe('api (integration)', () => {
   let server: Server;
   let baseUrl: string;
@@ -57,14 +54,14 @@ describe('api (integration)', () => {
     return body.accessToken as string;
   }
 
-  it('reports the database as connected on the health endpoint', async () => {
+  it('health says the db is connected', async () => {
     const { status, body } = await call('GET', '/api/health');
 
     expect(status).to.equal(200);
     expect(body.database).to.equal('connected');
   });
 
-  it('registers, then signs in with the same credentials', async () => {
+  it('register then log in', async () => {
     const registered = await call('POST', '/api/auth/register', {
       body: { name: 'Kaif', email: 'kaif@example.com', password: 'a-long-enough-password' },
     });
@@ -81,7 +78,7 @@ describe('api (integration)', () => {
     expect((signedIn.body.user as Json).email).to.equal('kaif@example.com');
   });
 
-  it('rejects a second registration of the same email with 409', async () => {
+  it('same email twice gives 409', async () => {
     const body = { name: 'Kaif', email: 'dup@example.com', password: 'a-long-enough-password' };
     await call('POST', '/api/auth/register', { body });
 
@@ -90,7 +87,7 @@ describe('api (integration)', () => {
     expect(second.status).to.equal(409);
   });
 
-  it('exchanges a refresh token for a fresh pair', async () => {
+  it('refresh gives new tokens', async () => {
     const registered = await call('POST', '/api/auth/register', {
       body: { name: 'Kaif', email: 'kaif@example.com', password: 'a-long-enough-password' },
     });
@@ -103,7 +100,7 @@ describe('api (integration)', () => {
     expect(refreshed.body.accessToken).to.be.a('string');
   });
 
-  it('accepts a logout from an authenticated caller', async () => {
+  it('logout with a token', async () => {
     const token = await signUp('kaif@example.com');
 
     const { status } = await call('POST', '/api/auth/logout', { token });
@@ -111,7 +108,7 @@ describe('api (integration)', () => {
     expect(status).to.equal(204);
   });
 
-  it('walks a note through create, list, read, update and delete', async () => {
+  it('create, list, read, update and delete a note', async () => {
     const token = await signUp('kaif@example.com');
 
     const created = await call('POST', '/api/notes', {
@@ -143,7 +140,7 @@ describe('api (integration)', () => {
     expect(gone.status).to.equal(404);
   });
 
-  it('keeps one user notes out of another user responses', async () => {
+  it('one user cannot see another users notes', async () => {
     const mine = await signUp('mine@example.com');
     const theirs = await signUp('theirs@example.com');
 
@@ -158,11 +155,11 @@ describe('api (integration)', () => {
     expect((await call('DELETE', `/api/notes/${id}`, { token: mine })).status).to.equal(404);
   });
 
-  it('refuses note requests without a token', async () => {
+  it('notes need a token', async () => {
     expect((await call('GET', '/api/notes')).status).to.equal(401);
   });
 
-  it('returns a 404 body for an unknown route', async () => {
+  it('unknown route gives 404', async () => {
     const { status, body } = await call('GET', '/api/nothing-here');
 
     expect(status).to.equal(404);

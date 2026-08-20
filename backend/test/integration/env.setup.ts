@@ -1,8 +1,5 @@
 import { config } from 'dotenv';
 
-// Loaded before any spec so src/config/prisma.ts builds its client against the
-// test database rather than the one in .env. Credentials stay in .env.test,
-// which is gitignored.
 config({ path: '.env.test' });
 
 process.env.NODE_ENV ??= 'test';

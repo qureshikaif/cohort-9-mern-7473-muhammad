@@ -8,7 +8,7 @@ describe('auth service (integration)', () => {
   after(() => prisma.$disconnect());
 
   describe('registerUser', () => {
-    it('stores the user with a hashed password and returns a token pair', async () => {
+    it('stores a hashed password and gives back tokens', async () => {
       const result = await registerUser({
         name: 'Kaif',
         email: 'kaif@example.com',
@@ -25,7 +25,7 @@ describe('auth service (integration)', () => {
       expect(stored?.role).to.equal('USER');
     });
 
-    it('never returns the password hash to the caller', async () => {
+    it('does not give back the password hash', async () => {
       const result = await registerUser({
         name: 'Kaif',
         email: 'kaif@example.com',
@@ -46,7 +46,7 @@ describe('auth service (integration)', () => {
       expect(await statusFrom(() => registerUser(input))).to.equal(409);
     });
 
-    it('leaves only one row when the same email is registered twice concurrently', async () => {
+    it('two signups with the same email leave one row', async () => {
       const input = {
         name: 'Kaif',
         email: 'race@example.com',
@@ -80,7 +80,7 @@ describe('auth service (integration)', () => {
       expect(status).to.equal(401);
     });
 
-    it('rejects an unknown email with the same 401', async () => {
+    it('rejects an unknown email with 401', async () => {
       const status = await statusFrom(() =>
         loginUser({ email: 'nobody@example.com', password: 'the-right-password' })
       );
@@ -90,7 +90,7 @@ describe('auth service (integration)', () => {
   });
 
   describe('refreshSession', () => {
-    it('exchanges a valid refresh token for a new pair', async () => {
+    it('refresh gives a new pair of tokens', async () => {
       const { refreshToken, user } = await createUser();
 
       const result = await refreshSession(refreshToken);
@@ -103,7 +103,7 @@ describe('auth service (integration)', () => {
       expect(await statusFrom(() => refreshSession('not-a-jwt'))).to.equal(401);
     });
 
-    it('rejects a token whose account has been deleted', async () => {
+    it('rejects a token for a deleted account', async () => {
       const { refreshToken, user } = await createUser();
       await prisma.user.delete({ where: { id: user.id } });
 
