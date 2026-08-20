@@ -68,16 +68,14 @@ interface Props {
 
 export function RichTextEditor({ value, onChange }: Props) {
   const editor = useEditor({
-    extensions: [StarterKit, Placeholder.configure({ placeholder: 'Start writing…' })],
+    extensions: [StarterKit, Placeholder.configure({ placeholder: 'Start writing...' })],
     content: value,
     onUpdate: ({ editor: current }) => onChange(current.getHTML()),
     editorProps: {
-      attributes: { class: 'note-prose ruled min-h-[46vh]' },
+      attributes: { class: 'note-prose ruled min-h-[45vh]' },
     },
   });
 
-  // An existing note's content arrives after the first render, so push it in
-  // once it differs. Typing is unaffected because onUpdate keeps the two in sync.
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value, { emitUpdate: false });
@@ -85,7 +83,7 @@ export function RichTextEditor({ value, onChange }: Props) {
   }, [editor, value]);
 
   if (!editor) {
-    return <div className="min-h-[46vh]" />;
+    return <div className="min-h-[45vh]" />;
   }
 
   return (
@@ -98,7 +96,7 @@ export function RichTextEditor({ value, onChange }: Props) {
             title={tool.title}
             aria-pressed={tool.isActive(editor)}
             onClick={() => tool.run(editor)}
-            className="min-w-9 cursor-pointer rounded-md px-2.5 py-1 text-sm text-ink-soft transition-colors duration-150 hover:bg-ink/8 hover:text-ink aria-pressed:bg-accent-soft aria-pressed:text-accent"
+            className="min-w-9 cursor-pointer rounded-md px-2.5 py-1 text-sm text-ink-soft transition-colors duration-150 hover:bg-ink/10 hover:text-ink aria-pressed:bg-accent-soft aria-pressed:text-accent"
           >
             {tool.label}
           </button>

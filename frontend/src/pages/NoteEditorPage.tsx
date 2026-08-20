@@ -74,11 +74,11 @@ export function NoteEditorPage() {
   }
 
   if (loading) {
-    return <Spinner label="Finding your note…" />;
+    return <Spinner label="Finding your note..." />;
   }
 
   return (
-    <div className="animate-sheet-in rounded-xs border border-edge bg-sheet px-5 py-6 shadow-lg sm:px-13 sm:py-10">
+    <div className="animate-sheet-in rounded-xs border border-edge bg-sheet px-5 py-6 shadow-lg sm:px-12 sm:py-10">
       {error ? <Alert>{error}</Alert> : null}
 
       <input
@@ -93,7 +93,7 @@ export function NoteEditorPage() {
 
       <div className="mt-5 flex items-center gap-2.5 border-t border-edge pt-4">
         <Button variant="primary" onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving…' : 'Save note'}
+          {saving ? 'Saving...' : 'Save note'}
         </Button>
 
         <Button variant="ghost" onClick={() => navigate('/')} disabled={saving}>
