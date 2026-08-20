@@ -22,13 +22,13 @@ function authHeader(call: unknown[]): string | undefined {
 }
 
 describe('session storage', () => {
-  it('round-trips a session', () => {
+  it('saves and reads back a session', () => {
     writeSession(session);
 
     expect(readSession()?.accessToken).toBe('access-1');
   });
 
-  it('discards a corrupted entry rather than throwing', () => {
+  it('ignores a broken session in storage', () => {
     localStorage.setItem('notes-app.session', 'not json');
 
     expect(readSession()).toBeNull();
@@ -37,7 +37,7 @@ describe('session storage', () => {
 });
 
 describe('login', () => {
-  it('surfaces the API message and field errors as an ApiError', async () => {
+  it('throws an ApiError with the field errors', async () => {
     global.fetch = jest.fn().mockResolvedValue(
       jsonResponse(400, {
         message: 'Validation failed',
@@ -52,7 +52,7 @@ describe('login', () => {
     });
   });
 
-  it('falls back to a generic message when the body is not JSON', async () => {
+  it('handles a non json error body', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 502,
@@ -67,7 +67,7 @@ describe('login', () => {
 });
 
 describe('authenticated requests', () => {
-  it('refreshes once and replays the original request after a 401', async () => {
+  it('retries once after a 401', async () => {
     writeSession(session);
 
     const fetchMock = jest
@@ -82,7 +82,6 @@ describe('authenticated requests', () => {
     expect(result.total).toBe(0);
     expect(fetchMock).toHaveBeenCalledTimes(3);
 
-    // first attempt with the stale token, then refresh, then a replay with the new one
     expect(authHeader(fetchMock.mock.calls[0])).toBe('Bearer access-1');
     expect(fetchMock.mock.calls[1][0]).toContain('/auth/refresh');
     expect(authHeader(fetchMock.mock.calls[2])).toBe('Bearer access-2');
@@ -90,7 +89,7 @@ describe('authenticated requests', () => {
     expect(readSession()?.accessToken).toBe('access-2');
   });
 
-  it('clears the session and gives up when the refresh also fails', async () => {
+  it('signs out when the refresh fails too', async () => {
     writeSession(session);
 
     global.fetch = jest
@@ -102,7 +101,7 @@ describe('authenticated requests', () => {
     expect(readSession()).toBeNull();
   });
 
-  it('does not call the API at all when there is no session', async () => {
+  it('does not call the api with no session', async () => {
     const fetchMock = jest.fn();
     global.fetch = fetchMock;
 

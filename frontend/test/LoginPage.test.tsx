@@ -32,7 +32,7 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
   });
 
-  it('stores the session and moves to the dashboard on success', async () => {
+  it('logs in and goes to the dashboard', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -49,7 +49,7 @@ describe('LoginPage', () => {
     expect(localStorage.getItem('notes-app.session')).toContain('access-1');
   });
 
-  it('shows the server message and stays put when the credentials are wrong', async () => {
+  it('shows the error for a wrong password', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
       status: 401,
@@ -68,7 +68,7 @@ describe('LoginPage', () => {
     expect(screen.queryByText('Your notes')).not.toBeInTheDocument();
   });
 
-  it('reports a transport failure instead of leaving the button spinning', async () => {
+  it('shows an error when the api is down', async () => {
     global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'));
 
     renderLogin();
