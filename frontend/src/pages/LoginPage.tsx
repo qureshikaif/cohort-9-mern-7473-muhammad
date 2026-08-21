@@ -4,6 +4,7 @@ import { useAuth } from '../auth/authContext';
 import { ApiError } from '../lib/api';
 import { AuthLayout } from '../components/AuthLayout';
 import { Alert, Button, Field } from '../components/ui';
+import { validateEmail, validatePassword, type FormErrors } from '../lib/validate';
 
 export function LoginPage() {
   const { signIn } = useAuth();
@@ -13,11 +14,24 @@ export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [busy, setBusy] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError('');
+
+    const found: FormErrors = {
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+
+    if (found.email || found.password) {
+      setFieldErrors(found);
+      return;
+    }
+
+    setFieldErrors({});
     setBusy(true);
 
     try {
@@ -44,8 +58,8 @@ export function LoginPage() {
         label="Email"
         type="email"
         autoComplete="email"
-        required
         value={email}
+        error={fieldErrors.email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
@@ -54,8 +68,8 @@ export function LoginPage() {
         label="Password"
         type="password"
         autoComplete="current-password"
-        required
         value={password}
+        error={fieldErrors.password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
