@@ -26,6 +26,18 @@ describe('validatePassword', () => {
   it('rejects an empty one', () => {
     expect(validatePassword('')).toBe('Password is required');
   });
+
+  it('accepts 72 bytes', () => {
+    expect(validatePassword('a'.repeat(72))).toBeUndefined();
+  });
+
+  it('rejects more than 72 bytes', () => {
+    expect(validatePassword('a'.repeat(73))).toBe('Password is too long');
+  });
+
+  it('counts bytes not characters, like bcrypt does', () => {
+    expect(validatePassword('é'.repeat(40))).toBe('Password is too long');
+  });
 });
 
 describe('validateName', () => {
