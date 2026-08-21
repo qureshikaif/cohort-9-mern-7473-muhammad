@@ -38,7 +38,7 @@ describe('auth service (integration)', () => {
     it('rejects a duplicate email with 409', async () => {
       const input = {
         name: 'Kaif',
-        email: 'taken@example.com',
+        email: 'kaif@example.com',
         password: 'Kaif@123',
       };
       await registerUser(input);
@@ -49,7 +49,7 @@ describe('auth service (integration)', () => {
     it('two signups with the same email leave one row', async () => {
       const input = {
         name: 'Kaif',
-        email: 'race@example.com',
+        email: 'kaif@example.com',
         password: 'Kaif@123',
       };
 
@@ -57,24 +57,24 @@ describe('auth service (integration)', () => {
       const fulfilled = results.filter((r) => r.status === 'fulfilled');
 
       expect(fulfilled).to.have.lengthOf(1);
-      expect(await prisma.user.count({ where: { email: 'race@example.com' } })).to.equal(1);
+      expect(await prisma.user.count({ where: { email: 'kaif@example.com' } })).to.equal(1);
     });
   });
 
   describe('loginUser', () => {
     it('accepts the correct password', async () => {
-      const { user } = await createUser('the-right-password');
+      const { user } = await createUser('Kaif@123');
 
-      const result = await loginUser({ email: user.email, password: 'the-right-password' });
+      const result = await loginUser({ email: user.email, password: 'Kaif@123' });
 
       expect(result.user.id).to.equal(user.id);
     });
 
     it('rejects a wrong password with 401', async () => {
-      const { user } = await createUser('the-right-password');
+      const { user } = await createUser('Kaif@123');
 
       const status = await statusFrom(() =>
-        loginUser({ email: user.email, password: 'the-wrong-password' })
+        loginUser({ email: user.email, password: 'Wrong@123' })
       );
 
       expect(status).to.equal(401);
@@ -82,7 +82,7 @@ describe('auth service (integration)', () => {
 
     it('rejects an unknown email with 401', async () => {
       const status = await statusFrom(() =>
-        loginUser({ email: 'nobody@example.com', password: 'the-right-password' })
+        loginUser({ email: 'kaif@example.com', password: 'Kaif@123' })
       );
 
       expect(status).to.equal(401);

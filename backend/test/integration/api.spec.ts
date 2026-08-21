@@ -79,7 +79,7 @@ describe('api (integration)', () => {
   });
 
   it('same email twice gives 409', async () => {
-    const body = { name: 'Kaif', email: 'dup@example.com', password: 'Kaif@123' };
+    const body = { name: 'Kaif', email: 'kaif@example.com', password: 'Kaif@123' };
     await call('POST', '/api/auth/register', { body });
 
     const second = await call('POST', '/api/auth/register', { body });
@@ -141,8 +141,8 @@ describe('api (integration)', () => {
   });
 
   it('one user cannot see another users notes', async () => {
-    const mine = await signUp('mine@example.com');
-    const theirs = await signUp('theirs@example.com');
+    const mine = await signUp('kaif@example.com');
+    const theirs = await signUp('sara@example.com');
 
     const created = await call('POST', '/api/notes', {
       token: theirs,
