@@ -32,6 +32,19 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
   });
 
+  it('does not call the api when the form is empty', async () => {
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock;
+
+    renderLogin();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
+
+    expect(await screen.findByText('Email is required')).toBeInTheDocument();
+    expect(screen.getByText('Password is required')).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('logs in and goes to the dashboard', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

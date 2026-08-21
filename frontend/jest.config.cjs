@@ -7,6 +7,7 @@ module.exports = {
   testMatch: ['<rootDir>/test/**/*.test.{ts,tsx}'],
   moduleNameMapper: {
     '\\.css$': 'identity-obj-proxy',
+    '\\.(svg|png|jpe?g|gif|webp)$': '<rootDir>/test/fileStub.ts',
     // needs the ./ prefix, a bare 'config' also matches one inside testing-library
     '^\\./runtimeConfig$': '<rootDir>/test/configStub.ts',
   },

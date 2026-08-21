@@ -4,6 +4,7 @@ import { useAuth } from '../auth/authContext';
 import { ApiError } from '../lib/api';
 import { AuthLayout } from '../components/AuthLayout';
 import { Alert, Button, Field } from '../components/ui';
+import { validateEmail, validateName, validatePassword, type FormErrors } from '../lib/validate';
 
 export function RegisterPage() {
   const { signUp } = useAuth();
@@ -13,12 +14,24 @@ export function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const [fieldErrors, setFieldErrors] = useState<FormErrors>({});
   const [busy, setBusy] = useState(false);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError('');
+
+    const found: FormErrors = {
+      name: validateName(name),
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+
+    if (found.name || found.email || found.password) {
+      setFieldErrors(found);
+      return;
+    }
+
     setFieldErrors({});
     setBusy(true);
 
@@ -28,7 +41,11 @@ export function RegisterPage() {
     } catch (cause) {
       if (cause instanceof ApiError) {
         setError(cause.message);
-        setFieldErrors(cause.fieldErrors);
+        setFieldErrors({
+          name: cause.fieldErrors.name?.[0],
+          email: cause.fieldErrors.email?.[0],
+          password: cause.fieldErrors.password?.[0],
+        });
       } else {
         setError('Could not reach the server');
       }
@@ -49,9 +66,8 @@ export function RegisterPage() {
         id="name"
         label="Name"
         autoComplete="name"
-        required
         value={name}
-        error={fieldErrors.name?.[0]}
+        error={fieldErrors.name}
         onChange={(e) => setName(e.target.value)}
       />
 
@@ -60,9 +76,8 @@ export function RegisterPage() {
         label="Email"
         type="email"
         autoComplete="email"
-        required
         value={email}
-        error={fieldErrors.email?.[0]}
+        error={fieldErrors.email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
@@ -71,9 +86,8 @@ export function RegisterPage() {
         label="Password"
         type="password"
         autoComplete="new-password"
-        required
         value={password}
-        error={fieldErrors.password?.[0]}
+        error={fieldErrors.password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
