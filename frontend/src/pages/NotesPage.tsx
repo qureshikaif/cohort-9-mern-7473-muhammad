@@ -25,19 +25,7 @@ function plainText(html: string): string {
     .trim();
 }
 
-function countWords(notes: Note[]): number {
-  return notes.reduce((total, note) => {
-    const text = plainText(note.content);
-    return total + (text ? text.split(' ').length : 0);
-  }, 0);
-}
-
-function editedThisWeek(notes: Note[]): number {
-  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  return notes.filter((note) => new Date(note.updatedAt).getTime() >= weekAgo).length;
-}
-
-export function DashboardPage() {
+export function NotesPage() {
   const navigate = useNavigate();
   const searchBox = useRef<HTMLInputElement>(null);
 
@@ -120,12 +108,6 @@ export function DashboardPage() {
     return copy.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
   }, [notes, sort]);
 
-  const stats = [
-    { label: notes.length === 1 ? 'note' : 'notes', value: String(notes.length) },
-    { label: 'edited this week', value: String(editedThisWeek(notes)) },
-    { label: 'words written', value: countWords(notes).toLocaleString() },
-  ];
-
   async function handleDelete(note: Note) {
     if (!window.confirm(`Delete "${note.title}"?`)) return;
 
@@ -143,17 +125,13 @@ export function DashboardPage() {
 
   return (
     <>
-      <section className="mb-6 grid gap-3 sm:grid-cols-3">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            className="animate-card-in rounded-xs border border-edge bg-sheet px-5 py-4 shadow-sm"
-          >
-            <p className="font-serif text-3xl leading-none">{stat.value}</p>
-            <p className="mt-1.5 text-xs tracking-wider text-ink-soft uppercase">{stat.label}</p>
-          </div>
-        ))}
-      </section>
+      <div className="mb-5">
+        <h1 className="font-serif text-3xl font-medium">Your notes</h1>
+        <p className="mt-1 text-sm text-ink-soft">
+          {notes.length} {notes.length === 1 ? 'note' : 'notes'}
+          {search ? ' matching' : ' in the notebook'}
+        </p>
+      </div>
 
       <div className="mb-5 flex flex-wrap items-center gap-3 border-y border-edge py-3">
         <div className="relative">
