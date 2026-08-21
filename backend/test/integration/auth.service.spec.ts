@@ -12,7 +12,7 @@ describe('auth service (integration)', () => {
       const result = await registerUser({
         name: 'Kaif',
         email: 'kaif@example.com',
-        password: 'a-long-enough-password',
+        password: 'Kaif@123',
       });
 
       expect(result.user.email).to.equal('kaif@example.com');
@@ -20,7 +20,7 @@ describe('auth service (integration)', () => {
       expect(result.refreshToken).to.be.a('string').and.have.lengthOf.above(0);
 
       const stored = await prisma.user.findUnique({ where: { email: 'kaif@example.com' } });
-      expect(stored?.password).to.not.equal('a-long-enough-password');
+      expect(stored?.password).to.not.equal('Kaif@123');
       expect(stored?.password).to.match(/^\$2[aby]\$/);
       expect(stored?.role).to.equal('USER');
     });
@@ -29,7 +29,7 @@ describe('auth service (integration)', () => {
       const result = await registerUser({
         name: 'Kaif',
         email: 'kaif@example.com',
-        password: 'a-long-enough-password',
+        password: 'Kaif@123',
       });
 
       expect(result.user).to.not.have.property('password');
@@ -39,7 +39,7 @@ describe('auth service (integration)', () => {
       const input = {
         name: 'Kaif',
         email: 'taken@example.com',
-        password: 'a-long-enough-password',
+        password: 'Kaif@123',
       };
       await registerUser(input);
 
@@ -50,7 +50,7 @@ describe('auth service (integration)', () => {
       const input = {
         name: 'Kaif',
         email: 'race@example.com',
-        password: 'a-long-enough-password',
+        password: 'Kaif@123',
       };
 
       const results = await Promise.allSettled([registerUser(input), registerUser(input)]);

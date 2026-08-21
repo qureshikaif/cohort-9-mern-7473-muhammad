@@ -34,12 +34,9 @@ Health check: <http://localhost:5000/api/health>
 
 ## Integration tests
 
-`npm test` needs nothing but Node. The service tests talk to a real PostgreSQL,
-because that is the only way to cover the queries themselves — ownership
-filters, the unique index on email, and the cascade from user to notes.
-
-They run against a throwaway database, never your development one. Create it,
-apply the migrations, then run them:
+`npm test` runs the unit tests and needs no database. The integration tests hit a
+real PostgreSQL, so they need one set up first. Use a separate database, not your
+dev one, because the tests empty the tables.
 
 ```bash
 createdb notes_app_test
@@ -48,9 +45,7 @@ npx dotenv -e .env.test -- npx prisma migrate deploy
 npm run test:integration
 ```
 
-`.env.test` is gitignored. Every spec truncates both tables before it runs, so
-the database is left empty between tests and the order they run in does not
-matter.
+`.env.test` is gitignored.
 
 ## Folder structure
 

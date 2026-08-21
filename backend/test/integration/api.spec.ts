@@ -48,7 +48,7 @@ describe('api (integration)', () => {
 
   async function signUp(email: string): Promise<string> {
     const { body } = await call('POST', '/api/auth/register', {
-      body: { name: 'Test User', email, password: 'a-long-enough-password' },
+      body: { name: 'Test User', email, password: 'Kaif@123' },
     });
 
     return body.accessToken as string;
@@ -63,7 +63,7 @@ describe('api (integration)', () => {
 
   it('register then log in', async () => {
     const registered = await call('POST', '/api/auth/register', {
-      body: { name: 'Kaif', email: 'kaif@example.com', password: 'a-long-enough-password' },
+      body: { name: 'Kaif', email: 'kaif@example.com', password: 'Kaif@123' },
     });
 
     expect(registered.status).to.equal(201);
@@ -71,7 +71,7 @@ describe('api (integration)', () => {
     expect((registered.body.user as Json).password).to.equal(undefined);
 
     const signedIn = await call('POST', '/api/auth/login', {
-      body: { email: 'kaif@example.com', password: 'a-long-enough-password' },
+      body: { email: 'kaif@example.com', password: 'Kaif@123' },
     });
 
     expect(signedIn.status).to.equal(200);
@@ -79,7 +79,7 @@ describe('api (integration)', () => {
   });
 
   it('same email twice gives 409', async () => {
-    const body = { name: 'Kaif', email: 'dup@example.com', password: 'a-long-enough-password' };
+    const body = { name: 'Kaif', email: 'dup@example.com', password: 'Kaif@123' };
     await call('POST', '/api/auth/register', { body });
 
     const second = await call('POST', '/api/auth/register', { body });
@@ -89,7 +89,7 @@ describe('api (integration)', () => {
 
   it('refresh gives new tokens', async () => {
     const registered = await call('POST', '/api/auth/register', {
-      body: { name: 'Kaif', email: 'kaif@example.com', password: 'a-long-enough-password' },
+      body: { name: 'Kaif', email: 'kaif@example.com', password: 'Kaif@123' },
     });
 
     const refreshed = await call('POST', '/api/auth/refresh', {

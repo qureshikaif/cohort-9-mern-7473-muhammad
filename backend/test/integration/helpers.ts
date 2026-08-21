@@ -10,7 +10,7 @@ export async function resetDatabase(): Promise<void> {
 let counter = 0;
 
 // unique email each time so specs do not collide
-export function createUser(password = 'a-long-enough-password'): Promise<AuthResult> {
+export function createUser(password = 'Kaif@123'): Promise<AuthResult> {
   counter += 1;
 
   return registerUser({
