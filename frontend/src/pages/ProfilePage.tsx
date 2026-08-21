@@ -4,6 +4,7 @@ import { useAuth } from '../auth/authContext';
 import { getProfile } from '../lib/api';
 import type { Profile } from '../lib/types';
 import { Alert, Button, Spinner } from '../components/ui';
+import { PasswordForm } from '../components/PasswordForm';
 
 const joined = new Intl.DateTimeFormat(undefined, {
   day: 'numeric',
@@ -81,6 +82,10 @@ export function ProfilePage() {
             Sign out
           </Button>
         </div>
+      </div>
+
+      <div className="mt-6">
+        <PasswordForm />
       </div>
     </>
   );

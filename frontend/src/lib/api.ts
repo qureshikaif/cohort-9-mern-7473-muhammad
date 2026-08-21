@@ -168,6 +168,13 @@ export function deleteNote(id: string): Promise<void> {
   return authed<void>(`/notes/${id}`, { method: 'DELETE' });
 }
 
+export function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  return authed<void>('/users/me/password', {
+    method: 'PATCH',
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+}
+
 export function getProfile(): Promise<{ profile: Profile }> {
   return authed<{ profile: Profile }>('/users/me');
 }
