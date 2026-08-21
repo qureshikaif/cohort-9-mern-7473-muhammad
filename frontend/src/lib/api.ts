@@ -70,7 +70,7 @@ function send(path: string, init: RequestInit, accessToken?: string): Promise<Re
   });
 }
 
-async function authed<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function authedResponse(path: string, init: RequestInit = {}): Promise<Response> {
   const session = readSession();
 
   if (!session) {
@@ -94,6 +94,12 @@ async function authed<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!response.ok) {
     throw await toError(response);
   }
+
+  return response;
+}
+
+async function authed<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const response = await authedResponse(path, init);
 
   return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
 }
@@ -221,8 +227,12 @@ export function getProfile(): Promise<{ profile: Profile }> {
   return authed<{ profile: Profile }>('/users/me');
 }
 
-export function exportNotes(): Promise<{ notes: unknown[]; exportedAt: string; version: number }> {
-  return authed('/notes/export');
+export async function exportNotes(format: string): Promise<{ body: string; filename: string }> {
+  const response = await authedResponse(`/notes/export?format=${format}`);
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const match = /filename="([^"]+)"/.exec(disposition);
+
+  return { body: await response.text(), filename: match ? match[1] : `notes.${format}` };
 }
 
 export function importNotes(notes: { title: string; content: string }[]): Promise<{

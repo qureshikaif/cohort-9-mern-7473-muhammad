@@ -317,6 +317,53 @@ describe('api (integration)', () => {
     expect(response.status).to.equal(400);
   });
 
+  it('exports markdown, text and html as well as json', async () => {
+    const token = await signUp('formats@example.com');
+    await call('POST', '/api/notes', {
+      token,
+      body: { title: 'Formatted', content: '<p>plain and <strong>bold</strong></p>' },
+    });
+
+    const asText = async (format: string) => {
+      const response = await fetch(`${baseUrl}/api/notes/export?format=${format}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return { type: response.headers.get('content-type') ?? '', body: await response.text() };
+    };
+
+    const md = await asText('md');
+    const txt = await asText('txt');
+    const html = await asText('html');
+
+    expect(md.type).to.contain('text/markdown');
+    expect(md.body).to.contain('# Formatted');
+    expect(md.body).to.contain('**bold**');
+
+    expect(txt.type).to.contain('text/plain');
+    expect(txt.body).to.contain('plain and bold');
+    expect(txt.body).to.not.contain('**');
+
+    expect(html.type).to.contain('text/html');
+    expect(html.body).to.contain('<!doctype html>');
+  });
+
+  it('names the download after the format', async () => {
+    const token = await signUp('filename@example.com');
+
+    const response = await fetch(`${baseUrl}/api/notes/export?format=md`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    expect(response.headers.get('content-disposition')).to.match(/filename="notes-.*\.md"/);
+  });
+
+  it('rejects a format it does not know', async () => {
+    const token = await signUp('badformat@example.com');
+    const { status } = await call('GET', '/api/notes/export?format=pdf', { token });
+
+    expect(status).to.equal(400);
+  });
+
   it('export and import need a token', async () => {
       expect((await call('GET', '/api/notes/export')).status).to.equal(401);
       expect((await call('POST', '/api/notes/import', { body: { notes: [] } })).status).to.equal(

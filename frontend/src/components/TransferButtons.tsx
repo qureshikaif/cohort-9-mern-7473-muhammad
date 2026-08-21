@@ -1,33 +1,14 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { exportNotes, importNotes } from '../lib/api';
+import { parseImportFile } from '../lib/importFile';
 import { Button } from './ui';
 
-interface ImportedNote {
-  title?: unknown;
-  content?: unknown;
-}
-
-function readNotes(parsed: unknown): { title: string; content: string }[] {
-  const raw = Array.isArray(parsed) ? parsed : ((parsed as { notes?: unknown })?.notes ?? []);
-
-  if (!Array.isArray(raw)) {
-    throw new Error('That file does not contain a list of notes');
-  }
-
-  const notes = raw
-    .filter((n): n is ImportedNote => typeof n === 'object' && n !== null)
-    .map((n) => ({
-      title: typeof n.title === 'string' ? n.title.trim() : '',
-      content: typeof n.content === 'string' ? n.content : '',
-    }))
-    .filter((n) => n.title.length > 0);
-
-  if (notes.length === 0) {
-    throw new Error('No notes with a title were found in that file');
-  }
-
-  return notes;
-}
+const formats = [
+  { key: 'json', label: 'JSON', note: 'can be imported back' },
+  { key: 'md', label: 'Markdown', note: 'headings and lists kept' },
+  { key: 'txt', label: 'Plain text', note: 'no formatting' },
+  { key: 'html', label: 'HTML', note: 'opens in a browser' },
+] as const;
 
 interface Props {
   onImported: (count: number) => void;
@@ -36,19 +17,41 @@ interface Props {
 
 export function TransferButtons({ onImported, onError }: Props) {
   const fileInput = useRef<HTMLInputElement>(null);
+  const menu = useRef<HTMLDivElement>(null);
   const [busy, setBusy] = useState<'export' | 'import' | null>(null);
+  const [open, setOpen] = useState(false);
 
-  async function handleExport() {
+  useEffect(() => {
+    if (!open) return;
+
+    function onPointerDown(event: MouseEvent) {
+      if (!menu.current?.contains(event.target as Node)) setOpen(false);
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false);
+    }
+
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [open]);
+
+  async function download(format: string, extension: string) {
+    setOpen(false);
     setBusy('export');
 
     try {
-      const payload = await exportNotes();
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
+      const { body, filename } = await exportNotes(format);
+      const url = URL.createObjectURL(new Blob([body]));
 
       const link = document.createElement('a');
       link.href = url;
-      link.download = `notes-${payload.exportedAt.slice(0, 10)}.json`;
+      link.download = filename || `notes.${extension}`;
       link.click();
 
       URL.revokeObjectURL(url);
@@ -63,7 +66,7 @@ export function TransferButtons({ onImported, onError }: Props) {
     setBusy('import');
 
     try {
-      const notes = readNotes(JSON.parse(await file.text()));
+      const notes = parseImportFile(file.name, await file.text());
       const { imported } = await importNotes(notes);
       onImported(imported);
     } catch (cause) {
@@ -76,22 +79,46 @@ export function TransferButtons({ onImported, onError }: Props) {
 
   return (
     <div className="flex gap-2">
-      <Button variant="ghost" onClick={handleExport} disabled={busy !== null}>
-        {busy === 'export' ? 'Exporting...' : 'Export'}
-      </Button>
+      <div className="relative" ref={menu}>
+        <Button
+          variant="ghost"
+          onClick={() => setOpen((current) => !current)}
+          disabled={busy !== null}
+          aria-haspopup="menu"
+          aria-expanded={open}
+        >
+          {busy === 'export' ? 'Exporting...' : 'Export'}
+        </Button>
 
-      <Button
-        variant="ghost"
-        onClick={() => fileInput.current?.click()}
-        disabled={busy !== null}
-      >
+        {open ? (
+          <div
+            role="menu"
+            className="absolute right-0 z-30 mt-2 w-56 animate-card-in overflow-hidden rounded-lg border border-edge bg-sheet shadow-lg"
+          >
+            {formats.map((format) => (
+              <button
+                key={format.key}
+                type="button"
+                role="menuitem"
+                onClick={() => void download(format.key, format.key)}
+                className="block w-full cursor-pointer border-b border-edge px-4 py-2.5 text-left transition-colors duration-150 last:border-b-0 hover:bg-ink/5"
+              >
+                <span className="block text-sm text-ink">{format.label}</span>
+                <span className="block text-xs text-ink-soft">{format.note}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      <Button variant="ghost" onClick={() => fileInput.current?.click()} disabled={busy !== null}>
         {busy === 'import' ? 'Importing...' : 'Import'}
       </Button>
 
       <input
         ref={fileInput}
         type="file"
-        accept="application/json,.json"
+        accept=".json,.txt,.md,application/json,text/plain,text/markdown"
         className="hidden"
         aria-hidden="true"
         tabIndex={-1}

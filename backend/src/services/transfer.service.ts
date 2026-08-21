@@ -1,4 +1,5 @@
 import { prisma } from '../config/prisma.js';
+import { renderExport, type ExportFormat } from '../utils/noteFormat.js';
 import type { ImportInput } from '../validators/transfer.validator.js';
 
 export interface ExportedNote {
@@ -22,6 +23,19 @@ export async function exportNotes(authorId: string, now: Date): Promise<NoteExpo
   });
 
   return { exportedAt: now.toISOString(), version: 1, notes };
+}
+
+export async function exportAsFormat(
+  authorId: string,
+  now: Date,
+  format: ExportFormat
+): Promise<{ body: string; count: number }> {
+  const payload = await exportNotes(authorId, now);
+
+  return {
+    body: renderExport(payload.notes, payload.exportedAt, format),
+    count: payload.notes.length,
+  };
 }
 
 export async function importNotes(authorId: string, input: ImportInput): Promise<number> {

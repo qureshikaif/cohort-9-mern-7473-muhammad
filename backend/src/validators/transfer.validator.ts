@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+export const exportQuerySchema = z.object({
+  format: z.enum(['json', 'md', 'txt', 'html']).default('json'),
+});
+
 const importedNote = z.object({
   title: z.string().trim().min(1).max(200),
   content: z.string().max(100000).default(''),
