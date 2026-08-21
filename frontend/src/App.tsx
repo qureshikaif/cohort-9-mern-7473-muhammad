@@ -12,11 +12,24 @@ const NoteEditorPage = lazy(() =>
   import('./pages/NoteEditorPage').then((m) => ({ default: m.NoteEditorPage }))
 );
 
+const SharedNotePage = lazy(() =>
+  import('./pages/SharedNotePage').then((m) => ({ default: m.SharedNotePage }))
+);
+
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+
+      <Route
+        path="/shared/:token"
+        element={
+          <Suspense fallback={<Spinner label="Opening the shared note..." />}>
+            <SharedNotePage />
+          </Suspense>
+        }
+      />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppShell />}>
