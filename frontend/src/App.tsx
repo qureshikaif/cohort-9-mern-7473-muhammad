@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProtectedRoute } from './auth/ProtectedRoute';
 import { DashboardPage } from './pages/DashboardPage';
 import { LoginPage } from './pages/LoginPage';
@@ -38,17 +39,21 @@ export default function App() {
           <Route
             path="notes/new"
             element={
-              <Suspense fallback={<Spinner label="Loading the editor..." />}>
-                <NoteEditorPage />
-              </Suspense>
+              <ErrorBoundary>
+                <Suspense fallback={<Spinner label="Loading the editor..." />}>
+                  <NoteEditorPage />
+                </Suspense>
+              </ErrorBoundary>
             }
           />
           <Route
             path="notes/:id"
             element={
-              <Suspense fallback={<Spinner label="Finding your note..." />}>
-                <NoteEditorPage />
-              </Suspense>
+              <ErrorBoundary>
+                <Suspense fallback={<Spinner label="Finding your note..." />}>
+                  <NoteEditorPage />
+                </Suspense>
+              </ErrorBoundary>
             }
           />
         </Route>

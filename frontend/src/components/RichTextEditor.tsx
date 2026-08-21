@@ -77,7 +77,9 @@ export function RichTextEditor({ value, onChange }: Props) {
   });
 
   useEffect(() => {
-    if (editor && value !== editor.getHTML()) {
+    if (!editor || editor.isDestroyed) return;
+
+    if (value !== editor.getHTML()) {
       editor.commands.setContent(value, { emitUpdate: false });
     }
   }, [editor, value]);
