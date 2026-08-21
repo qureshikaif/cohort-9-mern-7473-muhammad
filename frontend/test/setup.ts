@@ -18,5 +18,6 @@ beforeAll(() => {
 
 afterEach(() => {
   localStorage.clear();
+  sessionStorage.clear();
   jest.restoreAllMocks();
 });
