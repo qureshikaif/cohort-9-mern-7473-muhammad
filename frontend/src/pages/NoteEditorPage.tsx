@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ApiError, createNote, deleteNote, getNote, updateNote } from '../lib/api';
+import { useSharedSync } from '../lib/useSharedSync';
+import type { Note } from '../lib/types';
 import { RichTextEditor } from '../components/RichTextEditor';
+import { SharePanel } from '../components/SharePanel';
 import { Alert, Button, Spinner } from '../components/ui';
 
 export function NoteEditorPage() {
@@ -11,9 +14,13 @@ export function NoteEditorPage() {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [remoteNotice, setRemoteNotice] = useState('');
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  const loadedContent = useRef('');
 
   useEffect(() => {
     if (isNew || !id) return;
@@ -25,6 +32,8 @@ export function NoteEditorPage() {
         if (cancelled) return;
         setTitle(note.title);
         setContent(note.content);
+        setShareToken(note.shareToken);
+        loadedContent.current = note.content;
       })
       .catch((cause: unknown) => {
         if (!cancelled) {
@@ -39,6 +48,27 @@ export function NoteEditorPage() {
       cancelled = true;
     };
   }, [id, isNew]);
+
+  const onRemote = useCallback(
+    (note: Note) => {
+      if (note.content === loadedContent.current) return;
+
+      const dirty = content !== loadedContent.current;
+
+      if (dirty) {
+        setRemoteNotice('Someone edited this note through the share link. Reload to see it.');
+        return;
+      }
+
+      loadedContent.current = note.content;
+      setTitle(note.title);
+      setContent(note.content);
+      setRemoteNotice('Updated through the share link.');
+    },
+    [content]
+  );
+
+  useSharedSync(shareToken, onRemote);
 
   async function handleSave() {
     if (!title.trim()) {
@@ -81,6 +111,12 @@ export function NoteEditorPage() {
     <div className="animate-sheet-in rounded-xs border border-edge bg-sheet px-5 py-6 shadow-lg sm:px-12 sm:py-10">
       {error ? <Alert>{error}</Alert> : null}
 
+      {remoteNotice ? (
+        <p className="mb-4 rounded-lg border-l-4 border-accent bg-accent/10 px-3.5 py-2.5 text-sm">
+          {remoteNotice}
+        </p>
+      ) : null}
+
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -108,6 +144,17 @@ export function NoteEditorPage() {
           </Button>
         ) : null}
       </div>
+
+      {!isNew && id ? (
+        <div className="mt-4">
+          <SharePanel
+            noteId={id}
+            token={shareToken}
+            onChange={setShareToken}
+            onError={setError}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

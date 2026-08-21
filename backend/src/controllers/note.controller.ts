@@ -6,7 +6,7 @@ import {
   listNotes,
   updateNote,
 } from '../services/note.service.js';
-import { emitToUser } from '../sockets/index.js';
+import { emitToShared, emitToUser } from '../sockets/index.js';
 import { ApiError } from '../utils/ApiError.js';
 import type { JwtPayload } from '../utils/jwt.js';
 import { logger } from '../utils/logger.js';
@@ -53,6 +53,10 @@ export async function update(req: Body<UpdateNoteInput>, res: Response): Promise
 
   logger.info({ userId: authorId, noteId: id }, 'Note updated');
   emitToUser(authorId, 'note:updated', note);
+
+  if (note.shareToken) {
+    emitToShared(note.shareToken, note);
+  }
   res.status(200).json({ success: true, note });
 }
 
