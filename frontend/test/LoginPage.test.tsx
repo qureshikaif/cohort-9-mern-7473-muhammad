@@ -18,7 +18,7 @@ function renderLogin() {
 }
 
 const session = {
-  user: { id: 'u1', name: 'Kaif', email: 'kaif@example.com', role: 'USER' },
+  user: { id: 'a1b2c3', name: 'Kaif', email: 'kaif@example.com', role: 'USER' },
   accessToken: 'access-1',
   refreshToken: 'refresh-1',
 };

@@ -4,11 +4,11 @@ import { NoteCard } from '../src/components/NoteCard';
 import type { Note } from '../src/lib/types';
 
 const note: Note = {
-  id: 'n1',
+  id: 'abc123',
   title: 'Shopping list',
   content: '<p>Milk and <strong>bread</strong></p>',
-  createdAt: '2026-08-01T10:00:00.000Z',
-  updatedAt: '2026-08-02T10:00:00.000Z',
+  createdAt: '2026-07-14T09:12:03.000Z',
+  updatedAt: '2026-08-02T16:41:22.000Z',
 };
 
 describe('NoteCard', () => {
