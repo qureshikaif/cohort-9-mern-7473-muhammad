@@ -141,9 +141,13 @@ export async function logout(): Promise<void> {
   }
 }
 
-export function listNotes(search: string): Promise<NoteList> {
-  const query = search.trim() ? `?search=${encodeURIComponent(search.trim())}` : '';
-  return authed<NoteList>(`/notes${query}`);
+export function listNotes(search: string, limit?: number): Promise<NoteList> {
+  const params = new URLSearchParams();
+  if (search.trim()) params.set('search', search.trim());
+  if (limit) params.set('limit', String(limit));
+
+  const query = params.toString();
+  return authed<NoteList>(`/notes${query ? `?${query}` : ''}`);
 }
 
 export function getNote(id: string): Promise<{ note: Note }> {
