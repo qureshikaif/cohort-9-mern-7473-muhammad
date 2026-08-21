@@ -142,7 +142,7 @@ describe('api (integration)', () => {
 
   it('one user cannot see another users notes', async () => {
     const mine = await signUp('kaif@example.com');
-    const theirs = await signUp('sara@example.com');
+    const theirs = await signUp('qureshi@example.com');
 
     const created = await call('POST', '/api/notes', {
       token: theirs,

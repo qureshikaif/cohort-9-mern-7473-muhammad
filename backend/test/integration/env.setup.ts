@@ -4,8 +4,8 @@ config({ path: '.env.test' });
 
 process.env.NODE_ENV ??= 'test';
 process.env.LOG_LEVEL ??= 'silent';
-process.env.JWT_ACCESS_SECRET ??= 'integration-access-secret-not-real-01';
-process.env.JWT_REFRESH_SECRET ??= 'integration-refresh-secret-not-real-1';
+process.env.JWT_ACCESS_SECRET ??= '9cdf3fe1b5cd08f5c16f51298190d5f1b0cb21a8cb8793168ca97473a268bbc3';
+process.env.JWT_REFRESH_SECRET ??= 'e4f05ed690f8b1e5f86741d51cc144fe113de231b6f9693d39f4ed7f90e91f8f';
 
 if (!process.env.DATABASE_URL) {
   console.error(
