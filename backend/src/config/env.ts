@@ -14,7 +14,7 @@ const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).optional(),
-    PORT: z.coerce.number().int().positive().max(65535).default(5000),
+    PORT: z.coerce.number().int().positive().max(65535).default(8080),
     CLIENT_URL: z.string().url().default('http://localhost:5173'),
 
     DATABASE_URL: z
