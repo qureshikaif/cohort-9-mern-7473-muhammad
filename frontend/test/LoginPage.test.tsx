@@ -42,7 +42,7 @@ describe('LoginPage', () => {
     renderLogin();
 
     await userEvent.type(screen.getByLabelText('Email'), 'kaif@example.com');
-    await userEvent.type(screen.getByLabelText('Password'), 'long-enough-password');
+    await userEvent.type(screen.getByLabelText('Password'), 'Kaif@123');
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
     expect(await screen.findByText('Your notes')).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe('LoginPage', () => {
     renderLogin();
 
     await userEvent.type(screen.getByLabelText('Email'), 'kaif@example.com');
-    await userEvent.type(screen.getByLabelText('Password'), 'wrong-password');
+    await userEvent.type(screen.getByLabelText('Password'), 'Wrong@123');
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Invalid email or password');
@@ -74,7 +74,7 @@ describe('LoginPage', () => {
     renderLogin();
 
     await userEvent.type(screen.getByLabelText('Email'), 'kaif@example.com');
-    await userEvent.type(screen.getByLabelText('Password'), 'long-enough-password');
+    await userEvent.type(screen.getByLabelText('Password'), 'Kaif@123');
     await userEvent.click(screen.getByRole('button', { name: 'Sign in' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not reach the server');
