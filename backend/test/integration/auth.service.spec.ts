@@ -55,8 +55,11 @@ describe('auth service (integration)', () => {
 
       const results = await Promise.allSettled([registerUser(input), registerUser(input)]);
       const fulfilled = results.filter((r) => r.status === 'fulfilled');
+      const rejected = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
 
       expect(fulfilled).to.have.lengthOf(1);
+      expect(rejected).to.have.lengthOf(1);
+      expect(rejected[0].reason).to.have.property('statusCode', 409);
       expect(await prisma.user.count({ where: { email: 'kaif@example.com' } })).to.equal(1);
     });
   });
@@ -97,6 +100,7 @@ describe('auth service (integration)', () => {
 
       expect(result.user.id).to.equal(user.id);
       expect(result.accessToken).to.be.a('string').and.have.lengthOf.above(0);
+      expect(result.refreshToken).to.be.a('string').and.have.lengthOf.above(0);
     });
 
     it('rejects a malformed token with 401', async () => {

@@ -40,12 +40,17 @@ dev one, because the tests empty the tables.
 
 ```bash
 createdb notes_app_test
-echo 'DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/notes_app_test' > .env.test
+cat > .env.test <<'EOF'
+INTEGRATION_TEST_DATABASE=true
+DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/notes_app_test
+EOF
 npx dotenv -e .env.test -- npx prisma migrate deploy
 npm run test:integration
 ```
 
-`.env.test` is gitignored.
+`.env.test` is gitignored. The `INTEGRATION_TEST_DATABASE=true` line is required and
+the tests refuse to start without it, so a `DATABASE_URL` you have exported in your
+shell can never be the one that gets emptied.
 
 ## Folder structure
 
