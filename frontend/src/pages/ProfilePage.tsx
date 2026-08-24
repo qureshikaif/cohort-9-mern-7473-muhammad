@@ -73,7 +73,6 @@ export function ProfilePage() {
           </div>
         </div>
 
-        <Row label="Role" value={profile.role.toLowerCase()} />
         <Row label="Notes written" value={String(profile.noteCount)} />
         <Row label="Member since" value={joined.format(new Date(profile.joinedAt))} />
 

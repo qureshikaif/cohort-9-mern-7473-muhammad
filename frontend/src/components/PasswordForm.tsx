@@ -11,9 +11,9 @@ export function PasswordForm() {
   const [busy, setBusy] = useState(false);
 
   function localError(): string {
-    if (!current) return 'Your current password is required';
+    if (!current) return 'Fill in your current password';
     if (next.length < 8) return 'The new password must be at least 8 characters';
-    if (next === current) return 'The new password must be different';
+    if (next === current) return 'Pick something other than your old password';
     if (next !== confirm) return 'The two new passwords do not match';
     return '';
   }

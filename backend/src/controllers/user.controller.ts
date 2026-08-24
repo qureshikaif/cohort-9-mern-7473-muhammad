@@ -4,6 +4,8 @@ import { ApiError } from '../utils/ApiError.js';
 import { logger } from '../utils/logger.js';
 import type { ChangePasswordInput } from '../validators/user.validator.js';
 
+type Body<T> = Request<Record<string, string | string[]>, unknown, T>;
+
 export async function me(req: Request, res: Response): Promise<void> {
   if (!req.user) {
     throw ApiError.unauthorized();
@@ -15,7 +17,7 @@ export async function me(req: Request, res: Response): Promise<void> {
 }
 
 export async function updatePassword(
-  req: Request<Record<string, string | string[]>, unknown, ChangePasswordInput>,
+  req: Body<ChangePasswordInput>,
   res: Response
 ): Promise<void> {
   if (!req.user) {
