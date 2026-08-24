@@ -186,11 +186,11 @@ describe('api (integration)', () => {
 
     const changed = await call('PATCH', '/api/users/me/password', {
       token,
-      body: { currentPassword: 'a-long-enough-password', newPassword: 'Brand@New1' },
+      body: { currentPassword: 'Kaif@123', newPassword: 'Brand@New1' },
     });
 
     const oldLogin = await call('POST', '/api/auth/login', {
-      body: { email: 'changer@example.com', password: 'a-long-enough-password' },
+      body: { email: 'changer@example.com', password: 'Kaif@123' },
     });
     const newLogin = await call('POST', '/api/auth/login', {
       body: { email: 'changer@example.com', password: 'Brand@New1' },
@@ -206,7 +206,7 @@ describe('api (integration)', () => {
 
     const { status } = await call('PATCH', '/api/users/me/password', {
       token,
-      body: { currentPassword: 'not-my-password', newPassword: 'Brand@New1' },
+      body: { currentPassword: 'Wrong@123', newPassword: 'Brand@New1' },
     });
 
     expect(status).to.equal(401);
@@ -217,7 +217,7 @@ describe('api (integration)', () => {
 
     const { status } = await call('PATCH', '/api/users/me/password', {
       token,
-      body: { currentPassword: 'a-long-enough-password', newPassword: 'a-long-enough-password' },
+      body: { currentPassword: 'Kaif@123', newPassword: 'Kaif@123' },
     });
 
     expect(status).to.equal(400);
@@ -228,7 +228,7 @@ describe('api (integration)', () => {
 
     const { status } = await call('PATCH', '/api/users/me/password', {
       token,
-      body: { currentPassword: 'a-long-enough-password', newPassword: 'short' },
+      body: { currentPassword: 'Kaif@123', newPassword: 'short' },
     });
 
     expect(status).to.equal(400);
