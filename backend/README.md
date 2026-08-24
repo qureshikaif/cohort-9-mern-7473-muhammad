@@ -26,10 +26,31 @@ Health check: <http://localhost:5000/api/health>
 | `npm start`               | Run the compiled server (`dist/`)  |
 | `npm run typecheck`       | Type-check the project             |
 | `npm test`                | Run unit tests (Mocha + Chai)      |
+| `npm run test:integration`| Run service tests against a database |
 | `npm run lint`            | Lint with ESLint                   |
 | `npm run format`          | Format with Prettier               |
 | `npm run prisma:generate` | Generate the Prisma client         |
 | `npm run prisma:migrate`  | Create/apply a dev migration       |
+
+## Integration tests
+
+`npm test` runs the unit tests and needs no database. The integration tests hit a
+real PostgreSQL, so they need one set up first. Use a separate database, not your
+dev one, because the tests empty the tables.
+
+```bash
+createdb notes_app_test
+cat > .env.test <<'EOF'
+INTEGRATION_TEST_DATABASE=true
+DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/notes_app_test
+EOF
+npx dotenv -e .env.test -- npx prisma migrate deploy
+npm run test:integration
+```
+
+`.env.test` is gitignored. The `INTEGRATION_TEST_DATABASE=true` line is required and
+the tests refuse to start without it, so a `DATABASE_URL` you have exported in your
+shell can never be the one that gets emptied.
 
 ## Folder structure
 
