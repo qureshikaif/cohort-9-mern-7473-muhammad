@@ -14,7 +14,7 @@ docker run -d --name sonarqube -p 9000:9000 sonarqube:community
 Open http://localhost:9000, log in with `admin` / `admin`, change the password when it
 asks, then create a token under My Account > Security.
 
-Generate the coverage reports that Sonar reads:
+Generate the reports that Sonar reads:
 
 ```bash
 cd backend && npm run test:coverage
@@ -22,6 +22,13 @@ cd ../frontend && npm run test:coverage
 ```
 
 The backend run needs the test database, same as `npm run test:integration`.
+
+Each run writes two things into its `coverage/` folder: `lcov.info` for the coverage
+numbers and a test execution report so the dashboard shows the test count instead of a
+dash. The backend ones are `unit-tests.xml` and `integration-tests.xml`, the frontend
+one is `test-report.xml`. The `perl` step at the end of the backend script prefixes the
+paths inside those files with `backend/`, because mocha writes them relative to
+`backend/` and Sonar reads them from the repository root.
 
 Scan from the repository root:
 
@@ -42,7 +49,8 @@ React source instead of failing.
 ## Config
 
 `sonar-project.properties` in the repository root. It covers both projects, points at
-the two lcov files, and skips the generated Prisma client. Tailwind's `@theme` and
+the two lcov files and the three test execution reports, and skips the generated Prisma
+client. Tailwind's `@theme` and
 `@utility` at-rules are excluded from the CSS rule that does not know them.
 
 ## Files here

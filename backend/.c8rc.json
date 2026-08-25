@@ -1,6 +1,6 @@
 {
   "all": true,
   "include": ["src/**/*.ts"],
-  "exclude": ["src/generated/**", "src/server.ts", "test/**"],
+  "exclude": ["src/generated/**", "src/server.ts", "src/types/**", "test/**"],
   "reporter": ["lcov", "text-summary"]
 }
