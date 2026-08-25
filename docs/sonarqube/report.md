@@ -5,7 +5,7 @@
 | Project | notes-app |
 | Scanner | sonar-scanner-cli (Docker) |
 | Server | SonarQube Community 26.8 (Docker, localhost:9000) |
-| Commit | 0f29256 |
+| Commit | e5cd212 |
 | Date | 2026-08-25 |
 
 ## Quality gate: PASSED
@@ -16,6 +16,7 @@
 | Vulnerabilities | 0 |
 | Security hotspots | 0 |
 | Code smells | 45 |
+| Tests | 151 |
 | Coverage | 66.9% |
 | Duplicated lines | 0.0% |
 | Lines of code | 2910 |
@@ -24,22 +25,26 @@
 | Maintainability | A |
 | Technical debt | 5.2 hours |
 
-## Coverage
+## Tests and coverage
 
-| Project | Statements | Branches | Tool |
-|---|---|---|---|
-| backend | 94.0% | 80.4% | c8 over the unit and integration suites |
-| frontend | 29.3% | 25.9% | Jest |
+| Project | Tests | Lines | Branches | Tool |
+|---|---|---|---|---|
+| backend | 118 (74 unit, 44 integration) | 95.0% | 80.6% | mocha, coverage from c8 |
+| frontend | 33 | 29.3% | 28.9% | jest |
+| whole project | 151 | 70.7% | 59.6% | as SonarQube adds them up |
 
-Backend is covered by 74 unit tests and 52 integration tests that run against a real
-PostgreSQL. Frontend has 33 Jest tests covering the API client, form validation, the
-login page and the note card. The frontend number is the weak spot, most of the
-screens have no tests yet.
+All 151 pass, nothing skipped, nothing failing. The integration suite runs against a
+real PostgreSQL. Frontend tests cover the API client, form validation, the login page
+and the note card, and that 29.3% is the weak spot here, most of the screens have no
+tests yet.
+
+The test counts come from execution reports the two test runners write next to their
+lcov files, so the dashboard shows a real number under Unit Tests instead of a dash.
 
 ## Issues
 
-1 critical, 16 major, 28 minor. No bugs and no
-vulnerabilities. Everything below is a maintainability smell.
+1 critical, 16 major, 28 minor. No bugs and no vulnerabilities, everything below is a
+maintainability smell.
 
 | Severity | Location | Message |
 |---|---|---|
@@ -95,3 +100,7 @@ The first attempt used the sonarqube:lts-community image (9.9). Its bundled Type
 could not read the frontend tsconfig, so none of the React source was analysed and the
 line count came out at 1020 instead of 2910. Moving to the current community image
 fixed that. Worth knowing if anyone reproduces this with the LTS tag.
+
+The scan itself finishes with no warnings. Declaration files are kept out of the c8
+config, otherwise the lcov file names a `.d.ts` that Sonar does not index and the
+scanner logs an unresolved path for it.
