@@ -8,7 +8,7 @@ This folder holds the report and the screenshots from that run.
 Start the server:
 
 ```bash
-docker run -d --name sonarqube -p 9000:9000 sonarqube:lts-community
+docker run -d --name sonarqube -p 9000:9000 sonarqube:community
 ```
 
 Open http://localhost:9000, log in with `admin` / `admin`, change the password when it
@@ -28,12 +28,16 @@ Scan from the repository root:
 ```bash
 docker run --rm -v "$(pwd):/usr/src" sonarsource/sonar-scanner-cli \
   -Dsonar.host.url=http://host.docker.internal:9000 \
-  -Dsonar.login=YOUR_TOKEN
+  -Dsonar.token=YOUR_TOKEN
 ```
 
 On Linux use `--network host` and `http://localhost:9000` instead of
 `host.docker.internal`. Results appear at
 http://localhost:9000/dashboard?id=notes-app
+
+Use the `sonarqube:community` tag, not `lts-community`. The LTS image ships an older
+TypeScript that cannot read the frontend tsconfig, and it silently skips the whole
+React source instead of failing.
 
 ## Config
 
