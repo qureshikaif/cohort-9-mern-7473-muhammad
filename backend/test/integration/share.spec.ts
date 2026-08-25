@@ -71,6 +71,22 @@ describe('shared notes (integration)', () => {
     expect(second.body.token).to.equal(first.body.token);
   });
 
+  it('two share requests at once give the same link', async () => {
+    const { token, noteId } = await ownerWithNote('kaif@example.com');
+
+    const [first, second] = await Promise.all([
+      call('POST', `/api/notes/${noteId}/share`, { token }),
+      call('POST', `/api/notes/${noteId}/share`, { token }),
+    ]);
+
+    expect(first.status).to.equal(200);
+    expect(second.status).to.equal(200);
+    expect(first.body.token).to.equal(second.body.token);
+
+    const shared = await call('GET', `/api/shared/${first.body.token as string}`);
+    expect(shared.status).to.equal(200);
+  });
+
   it('anyone with the link can read it', async () => {
     const { token, noteId } = await ownerWithNote('kaif@example.com');
     const { body } = await call('POST', `/api/notes/${noteId}/share`, { token });

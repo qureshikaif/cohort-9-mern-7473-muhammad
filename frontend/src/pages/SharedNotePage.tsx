@@ -15,7 +15,8 @@ export function SharedNotePage() {
   const [failed, setFailed] = useState('');
   const [status, setStatus] = useState('');
 
-  const lastSaved = useRef('');
+  const lastSaved = useRef({ title: '', content: '' });
+  const pending = useRef<{ title?: string; content?: string }>({});
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export function SharedNotePage() {
         if (cancelled) return;
         setTitle(note.title);
         setContent(note.content);
-        lastSaved.current = note.content;
+        lastSaved.current = { title: note.title, content: note.content };
         setLoadedToken(token);
       })
       .catch(() => {
@@ -41,9 +42,11 @@ export function SharedNotePage() {
   }, [token]);
 
   const onRemote = useCallback((note: Note) => {
-    if (note.content === lastSaved.current) return;
+    if (note.content === lastSaved.current.content && note.title === lastSaved.current.title) {
+      return;
+    }
 
-    lastSaved.current = note.content;
+    lastSaved.current = { title: note.title, content: note.content };
     setTitle(note.title);
     setContent(note.content);
     setStatus('Updated by someone else');
@@ -54,13 +57,18 @@ export function SharedNotePage() {
   function save(next: { title?: string; content?: string }) {
     if (!token) return;
 
+    pending.current = { ...pending.current, ...next };
+
     clearTimeout(timer.current);
     setStatus('Saving...');
 
     timer.current = setTimeout(() => {
-      writeShared(token, next)
+      const draft = pending.current;
+      pending.current = {};
+
+      writeShared(token, draft)
         .then(({ note }) => {
-          lastSaved.current = note.content;
+          lastSaved.current = { title: note.title, content: note.content };
           setStatus('Saved');
         })
         .catch(() => setStatus('Could not save'));

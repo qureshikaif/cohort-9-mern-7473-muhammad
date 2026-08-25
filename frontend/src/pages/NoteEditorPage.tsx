@@ -22,6 +22,8 @@ export function NoteEditorPage() {
   const [error, setError] = useState('');
 
   const loadedContent = useRef('');
+  const draft = useRef('');
+  const loadedTitle = useRef('');
 
   useEffect(() => {
     if (isNew || !id) return;
@@ -36,6 +38,8 @@ export function NoteEditorPage() {
         setLoadedId(id);
         setShareToken(note.shareToken);
         loadedContent.current = note.content;
+        loadedTitle.current = note.title;
+        draft.current = note.content;
       })
       .catch((cause: unknown) => {
         if (cancelled) return;
@@ -51,24 +55,21 @@ export function NoteEditorPage() {
   const loadFailed = !isNew && failed?.id === id;
   const loading = !isNew && !loadFailed && loadedId !== id;
 
-  const onRemote = useCallback(
-    (note: Note) => {
-      if (note.content === loadedContent.current) return;
+  const onRemote = useCallback((note: Note) => {
+    if (note.content === loadedContent.current && note.title === loadedTitle.current) return;
 
-      const dirty = content !== loadedContent.current;
+    if (draft.current !== loadedContent.current) {
+      setRemoteNotice('Someone edited this note through the share link. Reload to see it.');
+      return;
+    }
 
-      if (dirty) {
-        setRemoteNotice('Someone edited this note through the share link. Reload to see it.');
-        return;
-      }
-
-      loadedContent.current = note.content;
-      setTitle(note.title);
-      setContent(note.content);
-      setRemoteNotice('Updated through the share link.');
-    },
-    [content]
-  );
+    loadedContent.current = note.content;
+    loadedTitle.current = note.title;
+    draft.current = note.content;
+    setTitle(note.title);
+    setContent(note.content);
+    setRemoteNotice('Updated through the share link.');
+  }, []);
 
   useSharedSync(shareToken, onRemote);
 
@@ -138,7 +139,13 @@ export function NoteEditorPage() {
         className="mb-1.5 w-full border-none bg-transparent py-1 font-serif text-3xl font-medium placeholder:text-ink-faint focus:outline-none sm:text-4xl"
       />
 
-      <RichTextEditor value={content} onChange={setContent} />
+      <RichTextEditor
+        value={content}
+        onChange={(html) => {
+          draft.current = html;
+          setContent(html);
+        }}
+      />
 
       <div className="mt-5 flex items-center gap-2.5 border-t border-edge pt-4">
         <Button variant="primary" onClick={handleSave} disabled={saving}>

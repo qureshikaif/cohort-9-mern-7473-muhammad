@@ -173,25 +173,33 @@ export function unshareNote(id: string): Promise<void> {
 }
 
 export async function readShared(token: string): Promise<{ note: Note }> {
-  const response = await send(`/shared/${token}`, {});
+  try {
+    const response = await send(`/shared/${token}`, {});
 
-  if (!response.ok) throw await toError(response);
+    if (!response.ok) throw await toError(response);
 
-  return (await response.json()) as { note: Note };
+    return (await response.json()) as { note: Note };
+  } catch (cause) {
+    throw cause instanceof ApiError ? cause : new ApiError(0, 'Could not reach the server');
+  }
 }
 
 export async function writeShared(
   token: string,
   input: { title?: string; content?: string }
 ): Promise<{ note: Note }> {
-  const response = await send(`/shared/${token}`, {
-    method: 'PATCH',
-    body: JSON.stringify(input),
-  });
+  try {
+    const response = await send(`/shared/${token}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    });
 
-  if (!response.ok) throw await toError(response);
+    if (!response.ok) throw await toError(response);
 
-  return (await response.json()) as { note: Note };
+    return (await response.json()) as { note: Note };
+  } catch (cause) {
+    throw cause instanceof ApiError ? cause : new ApiError(0, 'Could not reach the server');
+  }
 }
 
 export function deleteNote(id: string): Promise<void> {

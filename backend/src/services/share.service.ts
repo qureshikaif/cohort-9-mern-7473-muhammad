@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import { prisma } from '../config/prisma.js';
 import { ApiError } from '../utils/ApiError.js';
 import type { Note } from './note.service.js';
+import type { SharedUpdateInput } from '../validators/share.validator.js';
 
 export interface SharedNote extends Note {
   shareToken: string;
@@ -37,9 +38,25 @@ export async function createShareLink(authorId: string, noteId: string): Promise
 
   const shareToken = newToken();
 
-  await prisma.note.update({ where: { id: noteId }, data: { shareToken } });
+  const { count } = await prisma.note.updateMany({
+    where: { id: noteId, authorId, shareToken: null },
+    data: { shareToken },
+  });
 
-  return shareToken;
+  if (count === 1) {
+    return shareToken;
+  }
+
+  const claimed = await prisma.note.findFirst({
+    where: { id: noteId, authorId },
+    select: { shareToken: true },
+  });
+
+  if (!claimed?.shareToken) {
+    throw ApiError.notFound('Note not found');
+  }
+
+  return claimed.shareToken;
 }
 
 export async function revokeShareLink(authorId: string, noteId: string): Promise<void> {
@@ -68,7 +85,7 @@ export async function getSharedNote(shareToken: string): Promise<SharedNote> {
 
 export async function updateSharedNote(
   shareToken: string,
-  input: { title?: string; content?: string }
+  input: SharedUpdateInput
 ): Promise<SharedNote> {
   const { count } = await prisma.note.updateMany({ where: { shareToken }, data: input });
 

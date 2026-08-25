@@ -43,8 +43,16 @@ export function SharePanel({ noteId, token, onChange, onError }: Props) {
   }
 
   async function copy() {
-    await navigator.clipboard.writeText(link);
-    setCopied(true);
+    setBusy(true);
+
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopied(true);
+    } catch {
+      onError('Could not copy the link, select it and copy by hand');
+    } finally {
+      setBusy(false);
+    }
   }
 
   if (!token) {
