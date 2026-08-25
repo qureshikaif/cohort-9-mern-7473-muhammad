@@ -48,7 +48,7 @@ describe('shared notes (integration)', () => {
 
   async function ownerWithNote(email: string) {
     const registered = await call('POST', '/api/auth/register', {
-      body: { name: 'Owner', email, password: 'a-long-enough-password' },
+      body: { name: 'Owner', email, password: 'Kaif@123' },
     });
     const token = registered.body.accessToken as string;
 
@@ -60,8 +60,8 @@ describe('shared notes (integration)', () => {
     return { token, noteId: (created.body.note as Json).id as string };
   }
 
-  it('gives the owner a link and returns the same one twice', async () => {
-    const { token, noteId } = await ownerWithNote('owner1@example.com');
+  it('sharing twice gives the same link', async () => {
+    const { token, noteId } = await ownerWithNote('kaif@example.com');
 
     const first = await call('POST', `/api/notes/${noteId}/share`, { token });
     const second = await call('POST', `/api/notes/${noteId}/share`, { token });
@@ -71,8 +71,8 @@ describe('shared notes (integration)', () => {
     expect(second.body.token).to.equal(first.body.token);
   });
 
-  it('lets anyone with the link read the note without signing in', async () => {
-    const { token, noteId } = await ownerWithNote('owner2@example.com');
+  it('anyone with the link can read it', async () => {
+    const { token, noteId } = await ownerWithNote('kaif@example.com');
     const { body } = await call('POST', `/api/notes/${noteId}/share`, { token });
 
     const shared = await call('GET', `/api/shared/${body.token as string}`);
@@ -81,8 +81,8 @@ describe('shared notes (integration)', () => {
     expect((shared.body.note as Json).title).to.equal('Shared plan');
   });
 
-  it('lets a visitor edit through the link', async () => {
-    const { token, noteId } = await ownerWithNote('owner3@example.com');
+  it('a visitor can edit through the link', async () => {
+    const { token, noteId } = await ownerWithNote('kaif@example.com');
     const { body } = await call('POST', `/api/notes/${noteId}/share`, { token });
 
     const edited = await call('PATCH', `/api/shared/${body.token as string}`, {
@@ -95,8 +95,8 @@ describe('shared notes (integration)', () => {
     expect((asOwner.body.note as Json).content).to.equal('<p>edited by a guest</p>');
   });
 
-  it('stops working once the owner revokes it', async () => {
-    const { token, noteId } = await ownerWithNote('owner4@example.com');
+  it('revoking kills the link', async () => {
+    const { token, noteId } = await ownerWithNote('kaif@example.com');
     const { body } = await call('POST', `/api/notes/${noteId}/share`, { token });
     const link = body.token as string;
 
@@ -121,10 +121,10 @@ describe('shared notes (integration)', () => {
     expect(status).to.equal(400);
   });
 
-  it('will not let another account share a note it does not own', async () => {
-    const { noteId } = await ownerWithNote('owner5@example.com');
+  it('another account cannot share your note', async () => {
+    const { noteId } = await ownerWithNote('kaif@example.com');
     const intruder = await call('POST', '/api/auth/register', {
-      body: { name: 'Intruder', email: 'intruder@example.com', password: 'a-long-enough-password' },
+      body: { name: 'Qureshi', email: 'qureshi@example.com', password: 'Kaif@123' },
     });
 
     const { status } = await call('POST', `/api/notes/${noteId}/share`, {
@@ -134,8 +134,8 @@ describe('shared notes (integration)', () => {
     expect(status).to.equal(404);
   });
 
-  it('does not expose the note through the link before it is shared', async () => {
-    const { token, noteId } = await ownerWithNote('owner6@example.com');
+  it('no link until you share it', async () => {
+    const { token, noteId } = await ownerWithNote('kaif@example.com');
     const created = await call('GET', `/api/notes/${noteId}`, { token });
 
     expect((created.body.note as Json).shareToken).to.equal(null);
