@@ -23,7 +23,12 @@ export function AppShell() {
 
         {user ? (
           <>
-            <span className="hidden text-sm text-ink-soft sm:inline">{user.name}</span>
+            <Link
+              to="/profile"
+              className="hidden rounded-md px-2 py-1 text-sm text-ink-soft no-underline transition-colors duration-150 hover:bg-ink/5 hover:text-ink sm:inline"
+            >
+              {user.name}
+            </Link>
             <Button variant="ghost" onClick={handleSignOut}>
               Sign out
             </Button>

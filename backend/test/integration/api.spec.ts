@@ -165,4 +165,84 @@ describe('api (integration)', () => {
     expect(status).to.equal(404);
     expect(body.success).to.equal(false);
   });
+
+  it('gives back the profile with a note count', async () => {
+    const token = await signUp('kaif@example.com');
+    await call('POST', '/api/notes', { token, body: { title: 'One', content: '' } });
+    await call('POST', '/api/notes', { token, body: { title: 'Two', content: '' } });
+
+    const { status, body } = await call('GET', '/api/users/me', { token });
+    const profile = body.profile as Json;
+
+    expect(status).to.equal(200);
+    expect(profile.email).to.equal('kaif@example.com');
+    expect(profile.noteCount).to.equal(2);
+    expect(profile.joinedAt).to.be.a('string');
+    expect(profile.password).to.equal(undefined);
+  });
+
+  it('changes the password and lets the new one log in', async () => {
+    const token = await signUp('changer@example.com');
+
+    const changed = await call('PATCH', '/api/users/me/password', {
+      token,
+      body: { currentPassword: 'Kaif@123', newPassword: 'Brand@New1' },
+    });
+
+    const oldLogin = await call('POST', '/api/auth/login', {
+      body: { email: 'changer@example.com', password: 'Kaif@123' },
+    });
+    const newLogin = await call('POST', '/api/auth/login', {
+      body: { email: 'changer@example.com', password: 'Brand@New1' },
+    });
+
+    expect(changed.status).to.equal(204);
+    expect(oldLogin.status).to.equal(401);
+    expect(newLogin.status).to.equal(200);
+  });
+
+  it('refuses a change when the current password is wrong', async () => {
+    const token = await signUp('wrongcurrent@example.com');
+
+    const { status } = await call('PATCH', '/api/users/me/password', {
+      token,
+      body: { currentPassword: 'Wrong@123', newPassword: 'Brand@New1' },
+    });
+
+    expect(status).to.equal(401);
+  });
+
+  it('refuses reusing the same password', async () => {
+    const token = await signUp('samepass@example.com');
+
+    const { status } = await call('PATCH', '/api/users/me/password', {
+      token,
+      body: { currentPassword: 'Kaif@123', newPassword: 'Kaif@123' },
+    });
+
+    expect(status).to.equal(400);
+  });
+
+  it('refuses a short new password', async () => {
+    const token = await signUp('shortnew@example.com');
+
+    const { status } = await call('PATCH', '/api/users/me/password', {
+      token,
+      body: { currentPassword: 'Kaif@123', newPassword: 'short' },
+    });
+
+    expect(status).to.equal(400);
+  });
+
+  it('changing a password needs a token', async () => {
+    const { status } = await call('PATCH', '/api/users/me/password', {
+      body: { currentPassword: 'a', newPassword: 'Brand@New1' },
+    });
+
+    expect(status).to.equal(401);
+  });
+
+  it('profile needs a token', async () => {
+    expect((await call('GET', '/api/users/me')).status).to.equal(401);
+  });
 });
