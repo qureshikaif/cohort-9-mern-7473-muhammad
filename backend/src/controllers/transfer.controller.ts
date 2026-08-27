@@ -3,9 +3,11 @@ import { exportAsFormat, importNotes } from '../services/transfer.service.js';
 import { ApiError } from '../utils/ApiError.js';
 import { contentTypeFor } from '../utils/noteFormat.js';
 import { logger } from '../utils/logger.js';
-import { exportQuerySchema } from '../validators/transfer.validator.js';
+import { exportQuerySchema, type ImportInput } from '../validators/transfer.validator.js';
 
-function currentUserId(req: Request): string {
+type Body<T> = Request<Record<string, string | string[]>, unknown, T>;
+
+function currentUserId(req: { user?: { sub: string } }): string {
   if (!req.user) {
     throw ApiError.unauthorized();
   }
@@ -28,7 +30,7 @@ export async function exportAll(req: Request, res: Response): Promise<void> {
   res.status(200).send(body);
 }
 
-export async function importAll(req: Request, res: Response): Promise<void> {
+export async function importAll(req: Body<ImportInput>, res: Response): Promise<void> {
   const authorId = currentUserId(req);
   const imported = await importNotes(authorId, req.body);
 

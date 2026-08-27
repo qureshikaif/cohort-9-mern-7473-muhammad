@@ -24,6 +24,7 @@ export function Button({ variant = 'secondary', className = '', ...rest }: Butto
 }
 
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  id: string;
   label: string;
   error?: string;
   hint?: string;

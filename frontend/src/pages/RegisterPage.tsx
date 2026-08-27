@@ -55,7 +55,7 @@ export function RegisterPage() {
   const rules = [
     { label: `At least ${PASSWORD_MIN} characters`, met: password.length >= PASSWORD_MIN },
     {
-      label: `No more than ${PASSWORD_MAX_BYTES} characters`,
+      label: `No more than ${PASSWORD_MAX_BYTES} bytes`,
       met: password.length > 0 && passwordBytes(password) <= PASSWORD_MAX_BYTES,
     },
   ];

@@ -128,6 +128,10 @@ export function OverviewPage() {
         ))}
       </section>
 
+      <p className="mb-6 text-xs text-ink-faint">
+        Word counts and activity cover your 50 most recently edited notes.
+      </p>
+
       <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
         <section className="rounded-xs border border-edge bg-sheet px-5 py-5 shadow-sm">
           <ActivityChart days={days} />

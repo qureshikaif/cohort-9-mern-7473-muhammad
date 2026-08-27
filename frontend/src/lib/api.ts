@@ -227,7 +227,11 @@ export function getProfile(): Promise<{ profile: Profile }> {
   return authed<{ profile: Profile }>('/users/me');
 }
 
-export async function exportNotes(format: string): Promise<{ body: string; filename: string }> {
+export type ExportFormat = 'json' | 'md' | 'txt' | 'html';
+
+export async function exportNotes(
+  format: ExportFormat
+): Promise<{ body: string; filename: string }> {
   const response = await authedResponse(`/notes/export?format=${format}`);
   const disposition = response.headers.get('Content-Disposition') ?? '';
   const match = /filename="([^"]+)"/.exec(disposition);

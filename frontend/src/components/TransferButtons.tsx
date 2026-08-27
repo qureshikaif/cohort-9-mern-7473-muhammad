@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { exportNotes, importNotes } from '../lib/api';
+import { exportNotes, importNotes, type ExportFormat } from '../lib/api';
 import { parseImportFile } from '../lib/importFile';
 import { useDismiss } from '../lib/useDismiss';
 import { Button } from './ui';
@@ -24,7 +24,7 @@ export function TransferButtons({ onImported, onError }: Props) {
 
   useDismiss(open, menu, setOpen);
 
-  async function download(format: string, extension: string) {
+  async function download(format: ExportFormat, extension: string) {
     setOpen(false);
     setBusy('export');
 

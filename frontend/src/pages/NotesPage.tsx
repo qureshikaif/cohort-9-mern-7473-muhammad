@@ -111,14 +111,13 @@ export function NotesPage() {
   async function handleDelete(note: Note) {
     if (!window.confirm(`Delete "${note.title}"?`)) return;
 
-    const previous = notes;
     setNotes((current) => current.filter((n) => n.id !== note.id));
 
     try {
       await deleteNote(note.id);
       setNotice(`Deleted "${note.title}"`);
     } catch {
-      setNotes(previous);
+      setNotes((current) => (current.some((n) => n.id === note.id) ? current : [...current, note]));
       setError('Could not delete that note');
     }
   }
