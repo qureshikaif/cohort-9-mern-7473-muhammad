@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { exportNotes, importNotes } from '../lib/api';
 import { parseImportFile } from '../lib/importFile';
+import { useDismiss } from '../lib/useDismiss';
 import { Button } from './ui';
 
 const formats = [
@@ -21,25 +22,7 @@ export function TransferButtons({ onImported, onError }: Props) {
   const [busy, setBusy] = useState<'export' | 'import' | null>(null);
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    if (!open) return;
-
-    function onPointerDown(event: MouseEvent) {
-      if (!menu.current?.contains(event.target as Node)) setOpen(false);
-    }
-
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') setOpen(false);
-    }
-
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [open]);
+  useDismiss(open, menu, setOpen);
 
   async function download(format: string, extension: string) {
     setOpen(false);
