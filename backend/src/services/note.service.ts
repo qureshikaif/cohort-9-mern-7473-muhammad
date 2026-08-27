@@ -10,6 +10,7 @@ export interface Note {
   id: string;
   title: string;
   content: string;
+  shareToken: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +26,7 @@ const noteFields = {
   id: true,
   title: true,
   content: true,
+  shareToken: true,
   createdAt: true,
   updatedAt: true,
 } as const;

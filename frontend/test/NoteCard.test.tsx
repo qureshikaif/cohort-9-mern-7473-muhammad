@@ -7,6 +7,7 @@ const note: Note = {
   id: 'abc123',
   title: 'Shopping list',
   content: '<p>Milk and <strong>bread</strong></p>',
+  shareToken: null,
   createdAt: '2026-07-14T09:12:03.000Z',
   updatedAt: '2026-08-02T16:41:22.000Z',
 };

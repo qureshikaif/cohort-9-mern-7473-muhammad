@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { listNotes } from '../lib/api';
+import { useNoteEvents } from '../lib/useNoteEvents';
 import type { Note } from '../lib/types';
 import { NoteCard } from '../components/NoteCard';
 import { Alert, Spinner } from '../components/ui';
@@ -36,6 +37,25 @@ export function DashboardPage() {
       clearTimeout(timer);
     };
   }, [search]);
+
+  const handlers = useMemo(
+    () => ({
+      onCreated: (note: Note) => {
+        setNotes((current) =>
+          current.some((n) => n.id === note.id) ? current : [note, ...current]
+        );
+      },
+      onUpdated: (note: Note) => {
+        setNotes((current) => current.map((n) => (n.id === note.id ? note : n)));
+      },
+      onDeleted: (id: string) => {
+        setNotes((current) => current.filter((n) => n.id !== id));
+      },
+    }),
+    []
+  );
+
+  useNoteEvents(handlers);
 
   return (
     <>

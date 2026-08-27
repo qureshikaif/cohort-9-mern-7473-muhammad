@@ -164,6 +164,44 @@ export function updateNote(id: string, title: string, content: string): Promise<
   });
 }
 
+export function shareNote(id: string): Promise<{ token: string }> {
+  return authed<{ token: string }>(`/notes/${id}/share`, { method: 'POST' });
+}
+
+export function unshareNote(id: string): Promise<void> {
+  return authed<void>(`/notes/${id}/share`, { method: 'DELETE' });
+}
+
+export async function readShared(token: string): Promise<{ note: Note }> {
+  try {
+    const response = await send(`/shared/${token}`, {});
+
+    if (!response.ok) throw await toError(response);
+
+    return (await response.json()) as { note: Note };
+  } catch (cause) {
+    throw cause instanceof ApiError ? cause : new ApiError(0, 'Could not reach the server');
+  }
+}
+
+export async function writeShared(
+  token: string,
+  input: { title?: string; content?: string }
+): Promise<{ note: Note }> {
+  try {
+    const response = await send(`/shared/${token}`, {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    });
+
+    if (!response.ok) throw await toError(response);
+
+    return (await response.json()) as { note: Note };
+  } catch (cause) {
+    throw cause instanceof ApiError ? cause : new ApiError(0, 'Could not reach the server');
+  }
+}
+
 export function deleteNote(id: string): Promise<void> {
   return authed<void>(`/notes/${id}`, { method: 'DELETE' });
 }
