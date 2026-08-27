@@ -14,7 +14,6 @@ router.use(authenticate);
 router.post('/', validateBody(createNoteSchema), asyncHandler(create));
 router.get('/', asyncHandler(list));
 
-// must come before /:id or express treats "export" as an id
 router.get('/export', asyncHandler(exportAll));
 router.post('/import', validateBody(importSchema), asyncHandler(importAll));
 

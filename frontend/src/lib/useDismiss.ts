@@ -1,6 +1,5 @@
 import { useEffect, type RefObject } from 'react';
 
-// The sidebar menu and the export menu both needed this, so it lives here now.
 export function useDismiss(
   open: boolean,
   box: RefObject<HTMLDivElement | null>,
