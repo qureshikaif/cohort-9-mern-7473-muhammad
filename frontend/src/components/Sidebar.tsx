@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { FileText, House, User, type LucideIcon } from 'lucide-react';
 
 interface Item {
   to: string;
   label: string;
-  icon: string;
+  Icon: LucideIcon;
 }
 
 const items: Item[] = [
-  { to: '/', label: 'Overview', icon: 'M3 10.5 12 3l9 7.5M5.5 9.5V20h13V9.5' },
-  { to: '/notes', label: 'Notes', icon: 'M6 3h9l4 4v14H6zM15 3v4h4M9 12h7M9 16h5' },
-  { to: '/profile', label: 'Profile', icon: 'M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21c0-4 3.6-6 8-6s8 2 8 6' },
+  { to: '/', label: 'Overview', Icon: House },
+  { to: '/notes', label: 'Notes', Icon: FileText },
+  { to: '/profile', label: 'Profile', Icon: User },
 ];
 
 const STORAGE_KEY = 'notes-app.sidebar';
@@ -65,18 +66,7 @@ export function Sidebar() {
               } ${collapsed ? 'justify-center px-0' : ''}`
             }
           >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              className="size-5 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d={item.icon} />
-            </svg>
+            <item.Icon aria-hidden="true" className="size-5 shrink-0" strokeWidth={1.6} />
             {!collapsed ? item.label : null}
           </NavLink>
         ))}
