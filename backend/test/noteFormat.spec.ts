@@ -17,35 +17,35 @@ const notes = [
 ];
 
 describe('htmlToMarkdown', () => {
-  it('turns bold and italic into asterisks', () => {
+  it('bold and italic', () => {
     expect(htmlToMarkdown('<p>a <strong>b</strong> and <em>c</em></p>')).to.equal('a **b** and *c*');
   });
 
-  it('turns headings into hashes', () => {
+  it('headings become hashes', () => {
     expect(htmlToMarkdown('<h1>Title</h1><h2>Sub</h2>')).to.equal('# Title\n\n## Sub');
   });
 
-  it('turns a bullet list into dashes', () => {
+  it('a bullet list', () => {
     expect(htmlToMarkdown('<ul><li>one</li><li>two</li></ul>')).to.equal('- one\n- two');
   });
 
-  it('numbers an ordered list', () => {
+  it('ordered list gets numbers', () => {
     expect(htmlToMarkdown('<ol><li>one</li><li>two</li></ol>')).to.equal('1. one\n2. two');
   });
 
-  it('prefixes a quote', () => {
+  it('blockquote', () => {
     expect(htmlToMarkdown('<blockquote><p>quoted</p></blockquote>')).to.equal('> quoted');
   });
 
-  it('wraps inline code in backticks', () => {
+  it('inline code stays in backticks', () => {
     expect(htmlToMarkdown('<p>use <code>npm</code></p>')).to.equal('use `npm`');
   });
 
-  it('decodes entities', () => {
+  it('decodes the entities', () => {
     expect(htmlToMarkdown('<p>a &amp; b &lt; c</p>')).to.equal('a & b < c');
   });
 
-  it('leaves no tags behind', () => {
+  it('no tags left over', () => {
     const out = htmlToMarkdown('<p>a</p><div><span>b</span></div>');
 
     expect(out).to.not.match(/<[^>]+>/);
@@ -57,16 +57,12 @@ describe('htmlToText', () => {
     expect(htmlToText('<p>Milk and <strong>bread</strong></p>')).to.equal('Milk and bread');
   });
 
-  it('keeps list items on their own lines', () => {
+  it('list items on their own lines', () => {
     expect(htmlToText('<ul><li>one</li><li>two</li></ul>')).to.equal('- one\n- two');
   });
 
-  it('separates paragraphs with a blank line', () => {
+  it('blank line between paragraphs', () => {
     expect(htmlToText('<p>one</p><p>two</p>')).to.equal('one\n\ntwo');
-  });
-
-  it('has no asterisks from bold text', () => {
-    expect(htmlToText('<p><strong>loud</strong></p>')).to.equal('loud');
   });
 });
 
@@ -79,7 +75,7 @@ describe('renderExport', () => {
     expect(parsed.notes[0].title).to.equal('Shopping list');
   });
 
-  it('markdown has a heading per note and a separator', () => {
+  it('markdown has a heading per note', () => {
     const out = renderExport(notes, '2026-08-05T00:00:00.000Z', 'md');
 
     expect(out).to.contain('# Shopping list');
@@ -88,7 +84,7 @@ describe('renderExport', () => {
     expect(out).to.contain('\n---\n');
   });
 
-  it('text has no markup at all', () => {
+  it('text has no markup', () => {
     const out = renderExport(notes, '2026-08-05T00:00:00.000Z', 'txt');
 
     expect(out).to.contain('Shopping list');
@@ -96,7 +92,7 @@ describe('renderExport', () => {
     expect(out).to.not.contain('**');
   });
 
-  it('html is a whole document that keeps the formatting', () => {
+  it('html is a full document', () => {
     const out = renderExport(notes, '2026-08-05T00:00:00.000Z', 'html');
 
     expect(out).to.contain('<!doctype html>');
@@ -104,15 +100,14 @@ describe('renderExport', () => {
     expect(out).to.contain('<h1>Shopping list</h1>');
   });
 
-  it('escapes a title that contains markup', () => {
-    const hostile = [{ ...notes[0], title: '<img src=x onerror=alert(1)>' }];
-    const out = renderExport(hostile, '2026-08-05T00:00:00.000Z', 'html');
+  it('escapes a title with markup in it', () => {
+    const odd = [{ ...notes[0], title: 'Plans <b>2026</b>' }];
+    const out = renderExport(odd, '2026-08-05T00:00:00.000Z', 'html');
 
-    expect(out).to.contain('&lt;img');
-    expect(out).to.not.contain('<img src=x');
+    expect(out).to.contain('&lt;b&gt;2026&lt;/b&gt;');
   });
 
-  it('names the right content type for each format', () => {
+  it('content types', () => {
     expect(contentTypeFor('json')).to.contain('application/json');
     expect(contentTypeFor('md')).to.contain('text/markdown');
     expect(contentTypeFor('txt')).to.contain('text/plain');

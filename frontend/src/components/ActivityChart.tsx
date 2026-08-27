@@ -21,7 +21,7 @@ export function ActivityChart({ days }: { days: Day[] }) {
         viewBox={`0 0 ${width} ${height + 18}`}
         className="w-full"
         role="img"
-        aria-label={`Notes edited per day: ${days.map((d) => `${d.full} ${d.count}`).join(', ')}`}
+        aria-label="Notes edited per day"
       >
         <line
           x1="0"
@@ -38,7 +38,7 @@ export function ActivityChart({ days }: { days: Day[] }) {
 
           return (
             <g key={day.full}>
-              <title>{`${day.full}: ${day.count} ${day.count === 1 ? 'note' : 'notes'}`}</title>
+              <title>{`${day.full}: ${day.count}`}</title>
               <rect
                 x={x}
                 y={height - barHeight}
