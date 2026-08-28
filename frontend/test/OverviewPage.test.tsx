@@ -58,31 +58,13 @@ describe('OverviewPage', () => {
     expect(list).toHaveBeenCalledWith('', 50);
   });
 
-  it('the total comes from the server, not the page', async () => {
+  it('the tiles add up', async () => {
     renderOverview();
     await screen.findByText('Overview');
 
     expect(tileValue('notes')).toBe('9');
-  });
-
-  it('adds up the words', async () => {
-    renderOverview();
-    await screen.findByText('Overview');
-
     expect(tileValue('words written')).toBe('10');
-  });
-
-  it('the longest note wins', async () => {
-    renderOverview();
-    await screen.findByText('Overview');
-
     expect(tileValue('longest note')).toBe('7');
-  });
-
-  it('counts the ones edited this week', async () => {
-    renderOverview();
-    await screen.findByText('Overview');
-
     expect(tileValue('edited this week')).toBe('2');
   });
 
