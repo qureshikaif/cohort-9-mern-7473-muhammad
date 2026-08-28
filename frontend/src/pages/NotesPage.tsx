@@ -264,15 +264,15 @@ export function NotesPage() {
               <button
                 type="button"
                 onClick={() => navigate(`/notes/${note.id}`)}
-                className="flex-1 cursor-pointer text-left"
+                className="min-w-0 flex-1 cursor-pointer text-left"
               >
-                <span className="font-serif text-lg">{note.title}</span>
+                <span className="block truncate font-serif text-lg">{note.title}</span>
                 <span className="mt-0.5 block truncate text-sm text-ink-soft">
                   {plainText(note.content) || 'Empty note'}
                 </span>
               </button>
 
-              <span className="hidden text-xs tracking-wider text-ink-faint uppercase sm:inline">
+              <span className="hidden shrink-0 text-xs tracking-wider text-ink-faint uppercase sm:inline">
                 {dayFormat.format(new Date(note.updatedAt))}
               </span>
 
@@ -280,7 +280,7 @@ export function NotesPage() {
                 type="button"
                 onClick={() => void handleDelete(note)}
                 aria-label={`Delete ${note.title}`}
-                className="cursor-pointer rounded-full px-2 py-1 text-ink-faint opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:text-danger focus-visible:opacity-100"
+                className="shrink-0 cursor-pointer rounded-full px-2 py-1 text-ink-faint opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:text-danger focus-visible:opacity-100"
               >
                 &times;
               </button>
