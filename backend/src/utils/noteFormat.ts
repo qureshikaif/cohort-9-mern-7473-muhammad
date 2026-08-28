@@ -42,12 +42,14 @@ export function htmlToMarkdown(html: string): string {
     return `\n${listItems(inner, () => '-')}\n\n`;
   });
   out = out.replace(/<ol[^>]*>([\s\S]*?)<\/ol>/g, (_all, inner: string) => {
-    return `\n${listItems(inner, (index) => `${index + 1}.`)}\n\n`;
+    const numbered = listItems(inner, (index) => `${index + 1}.`);
+    return `\n${numbered}\n\n`;
   });
 
   out = out.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/g, (_all, inner: string) => {
     const lines = inner.replace(/<[^>]+>/g, '').trim().split('\n');
-    return `\n${lines.map((line) => `> ${line.trim()}`).join('\n')}\n\n`;
+    const quoted = lines.map((line) => `> ${line.trim()}`).join('\n');
+    return `\n${quoted}\n\n`;
   });
 
   out = out.replace(/<h1[^>]*>([\s\S]*?)<\/h1>/g, '\n# $1\n\n');
@@ -57,7 +59,7 @@ export function htmlToMarkdown(html: string): string {
   out = out.replace(/<pre[^>]*>([\s\S]*?)<\/pre>/g, '\n```\n$1\n```\n\n');
   out = out.replace(/<hr[^>]*\/?>/g, '\n---\n\n');
   out = out.replace(/<br[^>]*\/?>/g, '\n');
-  out = out.replace(/<\/p>/g, '\n\n');
+  out = out.replaceAll('</p>', '\n\n');
   out = out.replace(/<[^>]+>/g, '');
 
   return tidy(decode(out));
@@ -77,10 +79,10 @@ export function htmlToText(html: string): string {
 
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
 }
 
 const contentTypes: Record<ExportFormat, string> = {

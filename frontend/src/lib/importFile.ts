@@ -5,9 +5,9 @@ export interface ParsedNote {
 
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
 }
 
 function toParagraphs(lines: string[]): string {
@@ -33,7 +33,7 @@ function fromJson(text: string): ParsedNote[] {
   const raw = Array.isArray(parsed) ? parsed : ((parsed as { notes?: unknown })?.notes ?? []);
 
   if (!Array.isArray(raw)) {
-    throw new Error('That file does not contain a list of notes');
+    throw new TypeError('That file does not contain a list of notes');
   }
 
   return raw
