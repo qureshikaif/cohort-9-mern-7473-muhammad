@@ -13,23 +13,7 @@
   --accent-soft: #f3e2dc;
   --danger: #a8342b;
 
-  color-scheme: light dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #14161a;
-    --sheet: #1c1f25;
-    --ink: #e9e4d9;
-    --ink-soft: #a29c90;
-    --ink-faint: #6d6862;
-    --edge: #2a2e36;
-    --rule: #2b323d;
-    --margin-line: #7d4a44;
-    --accent: #e08163;
-    --accent-soft: #2e2320;
-    --danger: #e2726a;
-  }
+  color-scheme: light;
 }
 
 @theme inline {
