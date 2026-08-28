@@ -6,7 +6,7 @@
 | Scanner | sonar-scanner-cli (Docker) |
 | Server | SonarQube Community 26.8 (Docker, localhost:9000) |
 | Branch | develop |
-| Commit | 7b5a81d |
+| Commit | cd09235 |
 | Date | 2026-08-28 |
 
 ## Quality gate: FAILED
@@ -16,13 +16,13 @@ analysis on 25 August, so everything merged since then is measured against it.
 
 | Condition | Actual | Threshold | |
 |---|---|---|---|
-| Coverage on new code | 56.7% | at least 80% | fail |
+| Coverage on new code | 91.9% | at least 80% | pass |
 | New issues | 5 | 0 | fail |
 | Duplicated lines on new code | 0.0% | under 3% | pass |
 
-Overall code is clean. Both failures are about the export and import files from the
-last merge. An earlier run of this scan reported 16 new issues, 11 of which are fixed
-in this branch, so what is left is the five regular expressions listed below.
+Overall code is clean. The gate started out failing on both coverage and issues. The
+coverage side is sorted, new code is at 91.9%, and 11 of the 16 issues are fixed, so
+the only thing left is the five regular expressions listed below.
 
 ## Overall code
 
@@ -32,10 +32,10 @@ in this branch, so what is left is the five regular expressions listed below.
 | Vulnerabilities | 0 |
 | Security hotspots | 0 |
 | Code smells | 51 |
-| Tests | 194 |
-| Coverage | 67.5% |
-| Line coverage | 71.0% |
-| Branch coverage | 60.2% |
+| Tests | 241 |
+| Coverage | 77.8% |
+| Line coverage | 80.7% |
+| Branch coverage | 71.5% |
 | Duplicated lines | 0.0% |
 | Lines of code | 3797 |
 | Reliability | A |
@@ -48,13 +48,16 @@ in this branch, so what is left is the five regular expressions listed below.
 | Project | Tests | Lines | Branches | Tool |
 |---|---|---|---|---|
 | backend | 152 (91 unit, 61 integration) | 94.9% | 81.7% | mocha, coverage from c8 |
-| frontend | 42 | 27.1% | 29.2% | jest |
-| whole project | 194 | 71.0% | 60.2% | as SonarQube adds them up |
+| frontend | 89 | 53.3% | 56.8% | jest |
+| whole project | 241 | 80.7% | 71.5% | as SonarQube adds them up |
 
-All 194 pass, nothing skipped, nothing failing. The integration suite runs against a
-real PostgreSQL. The frontend number is the problem: 42 tests cover the API client,
-form validation, the login and signup pages and the note card, and nothing else, so
-the new dashboard screens pull the average down.
+All 241 pass, nothing skipped, nothing failing. The integration suite runs against a
+real PostgreSQL.
+
+The frontend started at 42 tests and 27.1% of lines, which is what failed the coverage
+condition. The four suites added in this branch cover the notes page, the overview
+page, the transfer buttons and the shell, and take it to 89 tests and 53.3%. The screens
+still without tests are the note editor, the shared note page and the profile page.
 
 ## New code issues
 
@@ -71,6 +74,12 @@ quantifier inside a group that can backtrack.
 
 ### Already fixed in this branch
 
+Coverage on new code went from 56.7% to 91.9% by adding four Jest suites:
+`NotesPage.test.tsx`, `OverviewPage.test.tsx`, `TransferButtons.test.tsx` and
+`AppShell.test.tsx`, 47 tests between them. `test/polyfills.ts` also gained a
+`Blob.prototype.text` shim, because jsdom does not implement it and the import path
+calls it.
+
 The first run of this scan found 16 new issues. These 11 are done:
 
 - eight `String#replace()` calls with a plain string pattern now use `replaceAll()`,
@@ -80,7 +89,7 @@ The first run of this scan found 16 new issues. These 11 are done:
 - two nested template literals in `htmlToMarkdown` pull the inner string into a
   variable first
 
-That took code smells from 62 to 51 and the debt from 8.2 to 7.2 hours. All 194 tests
+That took code smells from 62 to 51 and the debt from 8.2 to 7.2 hours. All 241 tests
 still pass.
 
 ## All 51 smells by rule
@@ -108,11 +117,12 @@ against a limit of 15.
 
 ## What it would take to pass the gate
 
-1. Rewrite the five backtracking regexes in `noteFormat.ts` and `importFile.ts`.
-   That clears the new issues condition. They are the `<tag>([\s\S]*?)</tag>` pairs
-   in the HTML conversion, so they need care and their own tests.
-2. Coverage on new code is 56.7% and needs 80%. The gap is all frontend, the new
-   dashboard, sidebar, overview and editor screens have no tests at all.
+Only one thing is left: rewrite the five backtracking regexes in `noteFormat.ts` and
+`importFile.ts`. They are the `<tag>([\s\S]*?)</tag>` pairs in the HTML conversion, so
+they change how the conversion works and want their own tests rather than being rushed
+in here.
+
+The coverage condition is already met at 91.9%.
 
 ## Notes on the run
 
