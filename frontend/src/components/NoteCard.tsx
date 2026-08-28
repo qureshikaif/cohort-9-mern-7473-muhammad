@@ -1,3 +1,4 @@
+import { plainText } from '../lib/text';
 import type { Note } from '../lib/types';
 
 const formatter = new Intl.DateTimeFormat(undefined, {
@@ -7,12 +8,7 @@ const formatter = new Intl.DateTimeFormat(undefined, {
 });
 
 function toExcerpt(html: string): string {
-  const text = html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  return text || 'Empty note';
+  return plainText(html) || 'Empty note';
 }
 
 interface Props {
@@ -22,7 +18,7 @@ interface Props {
   onDelete?: () => void;
 }
 
-export function NoteCard({ note, index, onOpen, onDelete }: Props) {
+export function NoteCard({ note, index, onOpen, onDelete }: Readonly<Props>) {
   return (
     <button
       type="button"

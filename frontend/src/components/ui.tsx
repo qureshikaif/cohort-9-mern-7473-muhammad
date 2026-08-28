@@ -19,8 +19,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: keyof typeof variants;
 }
 
-export function Button({ variant = 'secondary', className = '', ...rest }: ButtonProps) {
-  return <button className={`${base} ${variants[variant]} ${className}`} {...rest} />;
+export function Button({
+  variant = 'secondary',
+  className = '',
+  type = 'button',
+  ...rest
+}: Readonly<ButtonProps>) {
+  return <button type={type} className={`${base} ${variants[variant]} ${className}`} {...rest} />;
 }
 
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -30,8 +35,14 @@ interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
 }
 
-export function Field({ label, error, hint, id, className = '', ...rest }: FieldProps) {
-  const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
+export function Field({ label, error, hint, id, className = '', ...rest }: Readonly<FieldProps>) {
+  let describedBy: string | undefined;
+
+  if (error) {
+    describedBy = `${id}-error`;
+  } else if (hint) {
+    describedBy = `${id}-hint`;
+  }
 
   return (
     <div className="mb-4">
@@ -70,7 +81,7 @@ export function Field({ label, error, hint, id, className = '', ...rest }: Field
   );
 }
 
-export function Alert({ children }: { children: ReactNode }) {
+export function Alert({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <p
       role="alert"
@@ -81,7 +92,7 @@ export function Alert({ children }: { children: ReactNode }) {
   );
 }
 
-export function Spinner({ label }: { label?: string }) {
+export function Spinner({ label }: Readonly<{ label?: string }>) {
   return (
     <div
       role="status"

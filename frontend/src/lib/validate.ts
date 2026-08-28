@@ -9,7 +9,7 @@ export const PASSWORD_MAX_BYTES = 72;
 export const NAME_MIN = 2;
 export const NAME_MAX = 80;
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const emailPattern = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
 
 export function passwordBytes(password: string): number {
   return new TextEncoder().encode(password).length;

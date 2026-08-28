@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { deleteNote, listNotes } from '../lib/api';
 import { useNoteEvents } from '../lib/useNoteEvents';
+import { plainText } from '../lib/text';
 import type { Note } from '../lib/types';
 import { NoteCard } from '../components/NoteCard';
 import { TransferButtons } from '../components/TransferButtons';
@@ -42,13 +43,6 @@ function EmptyState({
       </Button>
     </div>
   );
-}
-
-function plainText(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
 }
 
 export function NotesPage() {
