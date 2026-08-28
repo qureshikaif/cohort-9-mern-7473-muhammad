@@ -70,7 +70,7 @@ function send(path: string, init: RequestInit, accessToken?: string): Promise<Re
   });
 }
 
-async function authed<T>(path: string, init: RequestInit = {}): Promise<T> {
+async function authedResponse(path: string, init: RequestInit = {}): Promise<Response> {
   const session = readSession();
 
   if (!session) {
@@ -94,6 +94,12 @@ async function authed<T>(path: string, init: RequestInit = {}): Promise<T> {
   if (!response.ok) {
     throw await toError(response);
   }
+
+  return response;
+}
+
+async function authed<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const response = await authedResponse(path, init);
 
   return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
 }
@@ -141,9 +147,13 @@ export async function logout(): Promise<void> {
   }
 }
 
-export function listNotes(search: string): Promise<NoteList> {
-  const query = search.trim() ? `?search=${encodeURIComponent(search.trim())}` : '';
-  return authed<NoteList>(`/notes${query}`);
+export function listNotes(search: string, limit?: number): Promise<NoteList> {
+  const params = new URLSearchParams();
+  if (search.trim()) params.set('search', search.trim());
+  if (limit) params.set('limit', String(limit));
+
+  const query = params.toString();
+  return authed<NoteList>(`/notes${query ? `?${query}` : ''}`);
 }
 
 export function getNote(id: string): Promise<{ note: Note }> {
@@ -215,4 +225,22 @@ export function changePassword(currentPassword: string, newPassword: string): Pr
 
 export function getProfile(): Promise<{ profile: Profile }> {
   return authed<{ profile: Profile }>('/users/me');
+}
+
+export type ExportFormat = 'json' | 'md' | 'txt' | 'html';
+
+export async function exportNotes(
+  format: ExportFormat
+): Promise<{ body: string; filename: string }> {
+  const response = await authedResponse(`/notes/export?format=${format}`);
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const match = /filename="([^"]+)"/.exec(disposition);
+
+  return { body: await response.text(), filename: match ? match[1] : `notes.${format}` };
+}
+
+export function importNotes(notes: { title: string; content: string }[]): Promise<{
+  imported: number;
+}> {
+  return authed('/notes/import', { method: 'POST', body: JSON.stringify({ notes }) });
 }

@@ -109,7 +109,7 @@ describe('authenticated requests', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('encodes the search term into the query string', async () => {
+  it('trims the search term into the query string', async () => {
     writeSession(session);
     const fetchMock = jest
       .fn()
@@ -118,6 +118,7 @@ describe('authenticated requests', () => {
 
     await listNotes('  meeting notes  ');
 
-    expect(fetchMock.mock.calls[0][0]).toContain('search=meeting%20notes');
+    const url = new URL(String(fetchMock.mock.calls[0][0]), 'http://localhost');
+    expect(url.searchParams.get('search')).toBe('meeting notes');
   });
 });

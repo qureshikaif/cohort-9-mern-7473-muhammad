@@ -4,6 +4,9 @@ import { useAuth } from '../auth/authContext';
 import { ApiError } from '../lib/api';
 import { AuthLayout } from '../components/AuthLayout';
 import { Alert, Button, Field } from '../components/ui';
+import { validateEmail, type FormErrors } from '../lib/validate';
+
+type FieldName = 'email' | 'password';
 
 export function LoginPage() {
   const { signIn } = useAuth();
@@ -12,12 +15,36 @@ export function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [touched, setTouched] = useState<Record<FieldName, boolean>>({
+    email: false,
+    password: false,
+  });
+  const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
+  const errors: FormErrors = {
+    email: validateEmail(email),
+    password: password ? undefined : 'Password is required',
+  };
+
+  const hasErrors = Boolean(errors.email || errors.password);
+
+  function shown(field: FieldName): string | undefined {
+    return touched[field] || submitted ? errors[field] : undefined;
+  }
+
+  function markTouched(field: FieldName) {
+    setTouched((current) => ({ ...current, [field]: true }));
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    setSubmitted(true);
     setError('');
+
+    if (hasErrors) return;
+
     setBusy(true);
 
     try {
@@ -44,8 +71,9 @@ export function LoginPage() {
         label="Email"
         type="email"
         autoComplete="email"
-        required
         value={email}
+        error={shown('email')}
+        onBlur={() => markTouched('email')}
         onChange={(e) => setEmail(e.target.value)}
       />
 
@@ -54,8 +82,9 @@ export function LoginPage() {
         label="Password"
         type="password"
         autoComplete="current-password"
-        required
         value={password}
+        error={shown('password')}
+        onBlur={() => markTouched('password')}
         onChange={(e) => setPassword(e.target.value)}
       />
 

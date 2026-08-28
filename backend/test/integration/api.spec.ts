@@ -245,4 +245,130 @@ describe('api (integration)', () => {
   it('profile needs a token', async () => {
     expect((await call('GET', '/api/users/me')).status).to.equal(401);
   });
+
+  describe('export and import', () => {
+    it('export from one account imports into another', async () => {
+      const source = await signUp('source@example.com');
+      await call('POST', '/api/notes', {
+        token: source,
+        body: { title: 'Kept', content: '<p>body</p>' },
+      });
+
+      const exported = await call('GET', '/api/notes/export', { token: source });
+      expect(exported.status).to.equal(200);
+      expect(exported.body.version).to.equal(1);
+
+      const notes = exported.body.notes as Json[];
+      expect(notes).to.have.lengthOf(1);
+      expect(notes[0]?.id).to.equal(undefined);
+      expect(notes[0]?.authorId).to.equal(undefined);
+
+      const target = await signUp('target@example.com');
+      const imported = await call('POST', '/api/notes/import', {
+        token: target,
+        body: { notes },
+      });
+
+      expect(imported.status).to.equal(201);
+      expect(imported.body.imported).to.equal(1);
+
+      const listed = await call('GET', '/api/notes', { token: target });
+      expect((listed.body.items as Json[])[0]?.title).to.equal('Kept');
+    });
+
+    it('export only has your own notes', async () => {
+      const mine = await signUp('mine@example.com');
+      const theirs = await signUp('theirs@example.com');
+      await call('POST', '/api/notes', { token: theirs, body: { title: 'Theirs', content: '' } });
+
+      const exported = await call('GET', '/api/notes/export', { token: mine });
+
+      expect(exported.body.notes as Json[]).to.have.lengthOf(0);
+    });
+
+    it('an import with no notes is rejected', async () => {
+      const token = await signUp('kaif@example.com');
+
+      const empty = await call('POST', '/api/notes/import', { token, body: { notes: [] } });
+      const untitled = await call('POST', '/api/notes/import', {
+        token,
+        body: { notes: [{ title: '', content: 'x' }] },
+      });
+
+      expect(empty.status).to.equal(400);
+      expect(untitled.status).to.equal(400);
+    });
+
+    it('the export route is not read as an id', async () => {
+      const token = await signUp('kaif@example.com');
+
+      expect((await call('GET', '/api/notes/export', { token })).status).to.equal(200);
+    });
+
+    it('a broken json body gives 400 not 500', async () => {
+    const token = await signUp('broken@example.com');
+
+    const response = await fetch(`${baseUrl}/api/notes/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: '{not json',
+    });
+
+    expect(response.status).to.equal(400);
+  });
+
+  it('exports markdown, text and html as well as json', async () => {
+    const token = await signUp('formats@example.com');
+    await call('POST', '/api/notes', {
+      token,
+      body: { title: 'Formatted', content: '<p>plain and <strong>bold</strong></p>' },
+    });
+
+    const asText = async (format: string) => {
+      const response = await fetch(`${baseUrl}/api/notes/export?format=${format}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return { type: response.headers.get('content-type') ?? '', body: await response.text() };
+    };
+
+    const md = await asText('md');
+    const txt = await asText('txt');
+    const html = await asText('html');
+
+    expect(md.type).to.contain('text/markdown');
+    expect(md.body).to.contain('# Formatted');
+    expect(md.body).to.contain('**bold**');
+
+    expect(txt.type).to.contain('text/plain');
+    expect(txt.body).to.contain('plain and bold');
+    expect(txt.body).to.not.contain('**');
+
+    expect(html.type).to.contain('text/html');
+    expect(html.body).to.contain('<!doctype html>');
+  });
+
+  it('names the download after the format', async () => {
+    const token = await signUp('filename@example.com');
+
+    const response = await fetch(`${baseUrl}/api/notes/export?format=md`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    expect(response.headers.get('content-disposition')).to.match(/filename="notes-.*\.md"/);
+  });
+
+  it('rejects a format it does not know', async () => {
+    const token = await signUp('badformat@example.com');
+    const { status } = await call('GET', '/api/notes/export?format=pdf', { token });
+
+    expect(status).to.equal(400);
+  });
+
+  it('export and import need a token', async () => {
+      expect((await call('GET', '/api/notes/export')).status).to.equal(401);
+      expect((await call('POST', '/api/notes/import', { body: { notes: [] } })).status).to.equal(
+        401
+      );
+    });
+  });
 });

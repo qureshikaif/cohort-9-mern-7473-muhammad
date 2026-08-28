@@ -24,17 +24,28 @@ export function Button({ variant = 'secondary', className = '', ...rest }: Butto
 }
 
 interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  id: string;
   label: string;
   error?: string;
+  hint?: string;
 }
 
-export function Field({ label, error, id, className = '', ...rest }: FieldProps) {
+export function Field({ label, error, hint, id, className = '', ...rest }: FieldProps) {
+  const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
+
   return (
-    <label className="mb-4 block" htmlFor={id}>
-      <span className="mb-1.5 block text-xs tracking-wider uppercase text-ink-soft">{label}</span>
+    <div className="mb-4">
+      <label
+        htmlFor={id}
+        className="mb-1.5 block text-xs tracking-wider uppercase text-ink-soft"
+      >
+        {label}
+      </label>
+
       <input
         id={id}
         aria-invalid={Boolean(error)}
+        aria-describedby={describedBy}
         className={
           'w-full rounded-lg border border-edge bg-sheet px-3 py-2.5 ' +
           'transition-[border-color,box-shadow] duration-150 ease-paper ' +
@@ -43,8 +54,19 @@ export function Field({ label, error, id, className = '', ...rest }: FieldProps)
         }
         {...rest}
       />
-      {error ? <span className="mt-1.5 block text-xs text-danger">{error}</span> : null}
-    </label>
+
+      {error ? (
+        <p id={`${id}-error`} className="mt-1.5 text-xs text-danger">
+          {error}
+        </p>
+      ) : null}
+
+      {!error && hint ? (
+        <p id={`${id}-hint`} className="mt-1.5 text-xs text-ink-soft">
+          {hint}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
