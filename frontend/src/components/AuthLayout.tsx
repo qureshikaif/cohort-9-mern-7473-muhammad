@@ -1,10 +1,10 @@
-import type { FormEvent, ReactNode } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 import { NotebookArt } from './NotebookArt';
 
 interface Props {
   title: string;
   subtitle: string;
-  onSubmit: (event: FormEvent) => void;
+  onSubmit: (event: SyntheticEvent) => void;
   children: ReactNode;
   footer: ReactNode;
 }

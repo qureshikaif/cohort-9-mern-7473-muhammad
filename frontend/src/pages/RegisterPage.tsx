@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/authContext';
 import { ApiError } from '../lib/api';
@@ -60,7 +60,7 @@ export function RegisterPage() {
     },
   ];
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SyntheticEvent) {
     event.preventDefault();
     setSubmitted(true);
     setError('');

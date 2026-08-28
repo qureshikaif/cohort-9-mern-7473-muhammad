@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type SyntheticEvent } from 'react';
 import { ApiError, changePassword } from '../lib/api';
 import { Alert, Button, Field } from './ui';
 
@@ -18,7 +18,7 @@ export function PasswordForm() {
     return '';
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SyntheticEvent) {
     event.preventDefault();
     setDone(false);
 

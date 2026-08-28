@@ -18,6 +18,32 @@ const sortOptions: { key: SortKey; label: string }[] = [
 
 const dayFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' });
 
+function EmptyState({
+  search,
+  onClear,
+  onNew,
+}: Readonly<{ search: string; onClear: () => void; onNew: () => void }>) {
+  if (search) {
+    return (
+      <div className="rounded-xs border border-dashed border-edge px-6 py-16 text-center">
+        <p className="font-serif text-xl">Nothing matches "{search}"</p>
+        <p className="mt-1 mb-5 text-sm text-ink-soft">Try a different word, or clear the search.</p>
+        <Button onClick={onClear}>Clear search</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xs border border-dashed border-edge px-6 py-16 text-center">
+      <p className="font-serif text-xl">Your notebook is empty</p>
+      <p className="mt-1 mb-5 text-sm text-ink-soft">Press n to start writing.</p>
+      <Button variant="primary" onClick={onNew}>
+        Write your first note
+      </Button>
+    </div>
+  );
+}
+
 function plainText(html: string): string {
   return html
     .replace(/<[^>]*>/g, ' ')
@@ -122,12 +148,17 @@ export function NotesPage() {
     }
   }
 
+  const showGrid = !loading && visible.length > 0 && view === 'grid';
+  const showList = !loading && visible.length > 0 && view === 'list';
+  const showEmpty = !loading && visible.length === 0;
+  const counted = `${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`;
+
   return (
     <>
       <div className="mb-5">
         <h1 className="font-serif text-3xl font-medium">Your notes</h1>
         <p className="mt-1 text-sm text-ink-soft">
-          {notes.length} {notes.length === 1 ? 'note' : 'notes'}
+          {counted}
           {search ? ' matching' : ' in the notebook'}
         </p>
       </div>
@@ -218,7 +249,7 @@ export function NotesPage() {
 
       {loading ? <Spinner label="Opening your notebook..." /> : null}
 
-      {!loading && visible.length > 0 && view === 'grid' ? (
+      {showGrid ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-5">
           {visible.map((note, index) => (
             <NoteCard
@@ -232,7 +263,7 @@ export function NotesPage() {
         </div>
       ) : null}
 
-      {!loading && visible.length > 0 && view === 'list' ? (
+      {showList ? (
         <ul className="divide-y divide-edge rounded-xs border border-edge bg-sheet">
           {visible.map((note) => (
             <li key={note.id} className="group flex items-center gap-4 px-5 py-3.5">
@@ -264,23 +295,12 @@ export function NotesPage() {
         </ul>
       ) : null}
 
-      {!loading && visible.length === 0 ? (
-        <div className="rounded-xs border border-dashed border-edge px-6 py-16 text-center">
-          <p className="font-serif text-xl">
-            {search ? `Nothing matches "${search}"` : 'Your notebook is empty'}
-          </p>
-          <p className="mt-1 mb-5 text-sm text-ink-soft">
-            {search ? 'Try a different word, or clear the search.' : 'Press n to start writing.'}
-          </p>
-
-          {search ? (
-            <Button onClick={() => setSearch('')}>Clear search</Button>
-          ) : (
-            <Button variant="primary" onClick={() => navigate('/notes/new')}>
-              Write your first note
-            </Button>
-          )}
-        </div>
+      {showEmpty ? (
+        <EmptyState
+          search={search}
+          onClear={() => setSearch('')}
+          onNew={() => navigate('/notes/new')}
+        />
       ) : null}
     </>
   );

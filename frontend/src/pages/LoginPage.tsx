@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type SyntheticEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/authContext';
 import { ApiError } from '../lib/api';
@@ -38,7 +38,7 @@ export function LoginPage() {
     setTouched((current) => ({ ...current, [field]: true }));
   }
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SyntheticEvent) {
     event.preventDefault();
     setSubmitted(true);
     setError('');
