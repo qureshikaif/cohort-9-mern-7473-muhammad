@@ -57,5 +57,5 @@ client. Tailwind's `@theme` and
 
 | File | What it is |
 |---|---|
-| `report.md` | Metrics and issues from the run |
+| `report.pdf` | Metrics and issues from the run |
 | `screenshots/` | Dashboard screenshots from localhost:9000 |
