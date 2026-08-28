@@ -84,6 +84,17 @@ describe('NotesPage', () => {
     expect(screen.getByRole('button', { name: 'Write your first note' })).toBeInTheDocument();
   });
 
+  it('spaces alone do not count as a search', async () => {
+    list.mockResolvedValue({ items: [], total: 0 });
+    renderNotes();
+    await screen.findByText('Your notebook is empty');
+
+    await userEvent.type(screen.getByLabelText('Search notes'), '   ');
+
+    expect(await screen.findByText('Your notebook is empty')).toBeInTheDocument();
+    expect(screen.queryByText(/Nothing matches/)).not.toBeInTheDocument();
+  });
+
   it('newest first by default', async () => {
     renderNotes();
     await screen.findByText('Shopping list');

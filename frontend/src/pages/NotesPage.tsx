@@ -142,6 +142,7 @@ export function NotesPage() {
     }
   }
 
+  const query = search.trim();
   const showGrid = !loading && visible.length > 0 && view === 'grid';
   const showList = !loading && visible.length > 0 && view === 'list';
   const showEmpty = !loading && visible.length === 0;
@@ -153,7 +154,7 @@ export function NotesPage() {
         <h1 className="font-serif text-3xl font-medium">Your notes</h1>
         <p className="mt-1 text-sm text-ink-soft">
           {counted}
-          {search ? ' matching' : ' in the notebook'}
+          {query ? ' matching' : ' in the notebook'}
         </p>
       </div>
 
@@ -291,7 +292,7 @@ export function NotesPage() {
 
       {showEmpty ? (
         <EmptyState
-          search={search}
+          search={query}
           onClear={() => setSearch('')}
           onNew={() => navigate('/notes/new')}
         />

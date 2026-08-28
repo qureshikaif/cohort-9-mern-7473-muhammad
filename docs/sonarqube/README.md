@@ -8,7 +8,7 @@ This folder holds the report and the screenshots from that run.
 Start the server:
 
 ```bash
-docker run -d --name sonarqube -p 9000:9000 sonarqube:community
+docker run -d --name sonarqube -p 127.0.0.1:9000:9000 sonarqube:community
 ```
 
 Open http://localhost:9000, log in with `admin` / `admin`, change the password when it
