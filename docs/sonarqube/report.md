@@ -6,7 +6,7 @@
 | Scanner | sonar-scanner-cli (Docker) |
 | Server | SonarQube Community 26.8 (Docker, localhost:9000) |
 | Branch | develop |
-| Commit | 486c08b |
+| Commit | 8bc1f76 |
 | Date | 2026-08-28 |
 
 ## Quality gate: PASSED
@@ -16,7 +16,7 @@ analysis on 25 August, so everything merged since then is measured against it.
 
 | Condition | Actual | Threshold | |
 |---|---|---|---|
-| Coverage on new code | 92.1% | at least 80% | pass |
+| Coverage on new code | 91.2% | at least 80% | pass |
 | Duplicated lines on new code | 0.0% | under 3% | pass |
 | New issues | 0 | 0 | pass |
 
@@ -30,12 +30,20 @@ Every figure below is the whole project, backend and frontend together.
 
 ### Ratings
 
-| | |
-|---|---|
-| Reliability | A |
-| Security | A |
-| Security review | A |
-| Maintainability | A |
+SonarQube 26 keeps two rating models. The old one rates reliability off the bug count,
+the newer one rates it off the severity of each issue's impact. The dashboard shows the
+newer one, so both are listed here.
+
+| | Old model | Current model |
+|---|---|---|
+| Reliability | A | A |
+| Security | A | A |
+| Maintainability | A | A |
+| Security review | A | A |
+
+Reliability was A on the old model but C on the current one, because five issues carried
+a medium reliability impact even though none of them were bugs. Those five are fixed, so
+the two models now agree.
 
 ### Issues
 
@@ -44,39 +52,39 @@ Every figure below is the whole project, backend and frontend together.
 | Bugs | 0 |
 | Vulnerabilities | 0 |
 | Security hotspots | 0 |
-| Code smells | 37 |
+| Code smells | 26 |
 | Blocker | 0 |
 | Critical | 0 |
-| Major | 14 |
-| Minor | 23 |
-| Technical debt | 204 min (3.4 hours) |
-| Debt ratio | 0.2% |
+| Major | 8 |
+| Minor | 18 |
+| Technical debt | 92 min (1.5 hours) |
+| Debt ratio | 0.1% |
 
 ### Size
 
 | | |
 |---|---|
-| Files | 75 |
-| Lines | 4520 |
-| Lines of code | 3837 |
-| Statements | 1159 |
-| Functions | 378 |
+| Files | 76 |
+| Lines | 4534 |
+| Lines of code | 3847 |
+| Statements | 1174 |
+| Functions | 377 |
 | Classes | 3 |
 | Comment lines | 7 (0.2%) |
-| Cyclomatic complexity | 675 |
-| Cognitive complexity | 345 |
+| Cyclomatic complexity | 676 |
+| Cognitive complexity | 349 |
 
 ### Coverage
 
 | | |
 |---|---|
 | Coverage | 77.9% |
-| Line coverage | 80.9% |
-| Branch coverage | 71.5% |
-| Lines to cover | 2306 |
-| Uncovered lines | 440 |
-| Conditions to cover | 1079 |
-| Uncovered conditions | 308 |
+| Line coverage | 81.0% |
+| Branch coverage | 71.3% |
+| Lines to cover | 2321 |
+| Uncovered lines | 442 |
+| Conditions to cover | 1082 |
+| Uncovered conditions | 311 |
 
 ### Tests
 
@@ -87,7 +95,7 @@ Every figure below is the whole project, backend and frontend together.
 | Failures | 0 |
 | Errors | 0 |
 | Skipped | 0 |
-| Run time | 22.6 s |
+| Run time | 21.8 s |
 
 ### Duplication
 
@@ -102,55 +110,51 @@ Every figure below is the whole project, backend and frontend together.
 | Project | Tests | Lines | Branches | Tool |
 |---|---|---|---|---|
 | backend | 152 (91 unit, 61 integration) | 94.8% | 81.7% | mocha, coverage from c8 |
-| frontend | 89 | 53.8% | 56.8% | jest |
-| whole project | 241 | 80.9% | 71.5% | as SonarQube adds them up |
+| frontend | 89 | 54.4% | 57.2% | jest |
+| whole project | 241 | 81.0% | 71.3% | as SonarQube adds them up |
 
 All 241 pass, nothing skipped, nothing failing. The integration suite runs against a
 real PostgreSQL.
 
 The frontend started at 42 tests and 27.1% of lines, which is what failed the coverage
 condition. The four suites added in this branch cover the notes page, the overview
-page, the transfer buttons and the shell, and take it to 89 tests and 53.8%. The screens
+page, the transfer buttons and the shell, and take it to 89 tests and 54.4%. The screens
 still without tests are the note editor, the shared note page and the profile page.
 
 ## New code issues
 
 None. The gate's new issues condition is met.
 
-## All 37 smells by rule
+## All 26 smells by rule
 
-No bugs, no vulnerabilities and no security hotspots, so all 37 are maintainability
-smells: 14 major and 23 minor, nothing critical or blocker.
+No bugs, no vulnerabilities, no security hotspots and nothing with a reliability or
+security impact, so all 26 are maintainability smells: 8 major and 18 minor, nothing
+critical or blocker.
 
 | Count | Severity | Rule | Where |
 |---|---|---|---|
-| 13 | MINOR | React props should be read-only | `ui.tsx` 22, 33, 73, 84 - `AuthProvider` 6 - `ActivityChart` 7 - `AuthLayout` 12 - `NoteCard` 25 - `NotebookArt` 3 - `RichTextEditor` 69 - `SharePanel` 12 - `TransferButtons` 19 - `ProfilePage` 15 |
 | 10 | MINOR | The most specific assertion should be used | `api.spec` 71, 181, 263, 264 - `auth.validator.spec` 114, 115, 116 - `apiError.spec` 36 - `share.spec` 157 - `sockets.spec` 131 |
-| 4 | MAJOR | Regular expressions should not cause non-linear backtracking | `NoteCard` 11 - `validate.ts` 12 - `NotesPage` 49 - `OverviewPage` 15 |
-| 4 | MAJOR | Prefer tag over ARIA role | `NoteCard` 36 - `ui.tsx` 86 - `NotesPage` 189, 203 |
+| 8 | MINOR | React props should be read-only | `AuthProvider` 6 - `ActivityChart` 7 - `AuthLayout` 12 - `NotebookArt` 3 - `RichTextEditor` 69 - `SharePanel` 12 - `TransferButtons` 19 - `ProfilePage` 15 |
+| 4 | MAJOR | Prefer tag over ARIA role | `NoteCard` 32 - `NotesPage` 183, 197 - `ui.tsx` 97 |
 | 1 | MAJOR | Template literals should not be nested | `api.ts` 156 |
-| 1 | MAJOR | Ternary operators should not be nested | `ui.tsx` 34 |
 | 1 | MAJOR | React Context Provider values should have stable identities | `AuthProvider` 32 |
-| 1 | MAJOR | `<button>` should have an explicit `type` attribute | `ui.tsx` 23 |
 | 1 | MAJOR | Test titles should be unique within the same suite | `auth.validator.spec` 77 |
 | 1 | MAJOR | Top-level await should be preferred over promise chains | `server.ts` 38 |
 
-None of these are in new code, so none of them affect the gate. The four remaining
-backtracking ones are the same `<[^>]*>` tag strip in three frontend files plus the
-email pattern in `validate.ts`.
+None of these are in new code, so none affect the gate.
 
-Two are arguable rather than wrong. `NoteCard:36` asks for a real `<button>` instead of
+`NoteCard:32` is arguable rather than wrong. Sonar asks for a real `<button>` instead of
 `role="button"`, but the card itself is already a button and nesting one inside another
 is not valid HTML, which is why the span is there. The ten assertion ones are Sonar
 preferring `to.be.undefined` over `to.equal(undefined)`.
 
 ## What was fixed in this branch
 
-### Coverage on new code, 56.7% to 92.1%
+### Coverage on new code, 56.7% to 91.2%
 
 Four Jest suites were added: `NotesPage.test.tsx`, `OverviewPage.test.tsx`,
 `TransferButtons.test.tsx` and `AppShell.test.tsx`, 47 tests between them. That took the
-frontend from 42 tests and 27.1% of lines to 89 tests and 53.8%. `test/polyfills.ts` also
+frontend from 42 tests and 27.1% of lines to 89 tests and 54.4%. `test/polyfills.ts` also
 gained a `Blob.prototype.text` shim, because jsdom does not implement it and the import
 path calls it.
 
@@ -174,6 +178,24 @@ path calls it.
   `/[ \t]+$/gm` did not help, a long run of spaces in the middle of a line still had to
   be retried, so it now splits on newlines and uses `trimEnd()` instead
 
+### Reliability, C to A
+
+Five issues carried a medium reliability impact, which held the current model's
+reliability rating at C:
+
+- the same `<[^>]*>` tag strip was copied into `NoteCard`, `NotesPage` and
+  `OverviewPage`. All three now call one `plainText` helper in `lib/text.ts` that walks
+  the string once, the same approach used for `stripTags` on the backend. Output is
+  unchanged, checked against the old version on eight inputs including unbalanced
+  brackets
+- the email pattern in `validate.ts` went from `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` to
+  `/^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/`. The old middle class allowed a dot, so the
+  engine had to guess where the domain ended. The new one rejects `a@b..c`, which the
+  old one accepted, and behaves the same on everything else
+- `Button` in `ui.tsx` now defaults to `type="button"`. Every caller inside a form
+  already passes `type="submit"`, so nothing changes there, but the buttons outside
+  forms no longer inherit the submit default
+
 ### Other issues cleared along the way
 
 - eight uses of the deprecated `FormEvent` type became `SyntheticEvent`, in
@@ -182,10 +204,18 @@ path calls it.
 - the one critical, `NotesPage` at a cognitive complexity of 18 against a limit of 15.
   The empty state moved into its own `EmptyState` component and the three render
   conditions were pulled out of the JSX into named booleans
+- the nested ternary in `Field` became an if/else, and five components now take
+  `Readonly` props
 
-Altogether code smells went from 62 to 37, the debt from 8.2 hours to 3.4, and both the
-critical count and the new issues count to zero. All 241 tests still pass and the
-export and import output is unchanged.
+Altogether code smells went from 62 to 26, the debt from 8.2 hours to 1.5, and the
+critical count, the reliability issues and the new issues are all at zero. All 241 tests
+still pass and the export and import output is unchanged.
+
+One thing that is not a Sonar issue but was worth changing: the signup password hint
+used to read "No more than 72 bytes". The limit is real, bcrypt ignores anything past 72
+bytes, but bytes mean nothing to someone filling in a form. The hint list now shows only
+the minimum length, and the byte check still runs and reports "Password is too long" if
+anyone actually hits it.
 
 ## Notes on the run
 
