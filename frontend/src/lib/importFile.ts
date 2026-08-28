@@ -67,7 +67,7 @@ function fromText(text: string, fallbackTitle: string): ParsedNote[] {
   }
 
   for (const line of lines.slice(headingAt)) {
-    const heading = /^#\s+(.*\S)/.exec(line);
+    const heading = /^#[ \t]+(\S.*)/.exec(line);
 
     if (heading) {
       flush();

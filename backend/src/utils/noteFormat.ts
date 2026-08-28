@@ -20,8 +20,33 @@ function decode(text: string): string {
   return entities.reduce((out, [pattern, char]) => out.replace(pattern, char), text);
 }
 
+function stripTags(text: string): string {
+  let out = '';
+  let at = 0;
+
+  while (at < text.length) {
+    if (text[at] === '<') {
+      const close = text.indexOf('>', at + 1);
+
+      if (close === -1) {
+        return out + text.slice(at);
+      }
+
+      if (close > at + 1) {
+        at = close + 1;
+        continue;
+      }
+    }
+
+    out += text[at];
+    at += 1;
+  }
+
+  return out;
+}
+
 function tidy(text: string): string {
-  return text.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  return text.replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 function listItems(block: string, marker: (index: number) => string): string {
@@ -47,7 +72,7 @@ export function htmlToMarkdown(html: string): string {
   });
 
   out = out.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/g, (_all, inner: string) => {
-    const lines = inner.replace(/<[^>]+>/g, '').trim().split('\n');
+    const lines = stripTags(inner).trim().split('\n');
     const quoted = lines.map((line) => `> ${line.trim()}`).join('\n');
     return `\n${quoted}\n\n`;
   });
@@ -60,7 +85,7 @@ export function htmlToMarkdown(html: string): string {
   out = out.replace(/<hr[^>]*\/?>/g, '\n---\n\n');
   out = out.replace(/<br[^>]*\/?>/g, '\n');
   out = out.replaceAll('</p>', '\n\n');
-  out = out.replace(/<[^>]+>/g, '');
+  out = stripTags(out);
 
   return tidy(decode(out));
 }
@@ -72,7 +97,7 @@ export function htmlToText(html: string): string {
   out = out.replace(/<(h[1-3]|p|blockquote|pre)[^>]*>/g, '');
   out = out.replace(/<\/(h[1-3]|p|blockquote|pre|ul|ol)>/g, '\n\n');
   out = out.replace(/<br[^>]*\/?>/g, '\n');
-  out = out.replace(/<[^>]+>/g, '');
+  out = stripTags(out);
 
   return tidy(decode(out));
 }
