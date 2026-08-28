@@ -46,7 +46,12 @@ function stripTags(text: string): string {
 }
 
 function tidy(text: string): string {
-  return text.replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim();
+  const trimmed = text
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .join('\n');
+
+  return trimmed.replace(/\n{3,}/g, '\n\n').trim();
 }
 
 function listItems(block: string, marker: (index: number) => string): string {
