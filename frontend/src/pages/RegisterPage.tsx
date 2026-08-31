@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/authContext';
 import { ApiError } from '../lib/api';
@@ -7,9 +7,7 @@ import { Alert, Button, Field } from '../components/ui';
 import {
   NAME_MAX,
   NAME_MIN,
-  PASSWORD_MAX_BYTES,
   PASSWORD_MIN,
-  passwordBytes,
   validateEmail,
   validateName,
   validatePassword,
@@ -54,13 +52,9 @@ export function RegisterPage() {
 
   const rules = [
     { label: `At least ${PASSWORD_MIN} characters`, met: password.length >= PASSWORD_MIN },
-    {
-      label: `No more than ${PASSWORD_MAX_BYTES} bytes`,
-      met: password.length > 0 && passwordBytes(password) <= PASSWORD_MAX_BYTES,
-    },
   ];
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: SyntheticEvent) {
     event.preventDefault();
     setSubmitted(true);
     setError('');

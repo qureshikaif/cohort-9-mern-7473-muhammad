@@ -13,20 +13,6 @@
       --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
     }
 
-    @media (prefers-color-scheme: dark) {
-      svg {
-        --paper: #14161a;
-        --sheet: #1c1f25;
-        --ink: #e9e4d9;
-        --ink-soft: #a29c90;
-        --ink-faint: #6d6862;
-        --edge: #2a2e36;
-        --rule: #2b323d;
-        --margin-line: #7d4a44;
-        --accent: #e08163;
-      }
-    }
-
     .sticky-a { fill: var(--accent); fill-opacity: .25; stroke: var(--accent); stroke-opacity: .3 }
     .sticky-a-lines { stroke: var(--accent); stroke-opacity: .4 }
     .sticky-b { fill: var(--rule); fill-opacity: .6; stroke: var(--edge) }

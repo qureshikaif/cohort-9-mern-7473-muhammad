@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { deleteNote, listNotes } from '../lib/api';
 import { useNoteEvents } from '../lib/useNoteEvents';
+import { plainText } from '../lib/text';
 import type { Note } from '../lib/types';
 import { NoteCard } from '../components/NoteCard';
 import { TransferButtons } from '../components/TransferButtons';
@@ -18,11 +19,30 @@ const sortOptions: { key: SortKey; label: string }[] = [
 
 const dayFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' });
 
-function plainText(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
+function EmptyState({
+  search,
+  onClear,
+  onNew,
+}: Readonly<{ search: string; onClear: () => void; onNew: () => void }>) {
+  if (search) {
+    return (
+      <div className="rounded-xs border border-dashed border-edge px-6 py-16 text-center">
+        <p className="font-serif text-xl">Nothing matches "{search}"</p>
+        <p className="mt-1 mb-5 text-sm text-ink-soft">Try a different word, or clear the search.</p>
+        <Button onClick={onClear}>Clear search</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xs border border-dashed border-edge px-6 py-16 text-center">
+      <p className="font-serif text-xl">Your notebook is empty</p>
+      <p className="mt-1 mb-5 text-sm text-ink-soft">Press n to start writing.</p>
+      <Button variant="primary" onClick={onNew}>
+        Write your first note
+      </Button>
+    </div>
+  );
 }
 
 export function NotesPage() {
@@ -122,13 +142,19 @@ export function NotesPage() {
     }
   }
 
+  const query = search.trim();
+  const showGrid = !loading && visible.length > 0 && view === 'grid';
+  const showList = !loading && visible.length > 0 && view === 'list';
+  const showEmpty = !loading && visible.length === 0;
+  const counted = `${notes.length} ${notes.length === 1 ? 'note' : 'notes'}`;
+
   return (
     <>
       <div className="mb-5">
         <h1 className="font-serif text-3xl font-medium">Your notes</h1>
         <p className="mt-1 text-sm text-ink-soft">
-          {notes.length} {notes.length === 1 ? 'note' : 'notes'}
-          {search ? ' matching' : ' in the notebook'}
+          {counted}
+          {query ? ' matching' : ' in the notebook'}
         </p>
       </div>
 
@@ -218,7 +244,7 @@ export function NotesPage() {
 
       {loading ? <Spinner label="Opening your notebook..." /> : null}
 
-      {!loading && visible.length > 0 && view === 'grid' ? (
+      {showGrid ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-5">
           {visible.map((note, index) => (
             <NoteCard
@@ -232,22 +258,22 @@ export function NotesPage() {
         </div>
       ) : null}
 
-      {!loading && visible.length > 0 && view === 'list' ? (
+      {showList ? (
         <ul className="divide-y divide-edge rounded-xs border border-edge bg-sheet">
           {visible.map((note) => (
             <li key={note.id} className="group flex items-center gap-4 px-5 py-3.5">
               <button
                 type="button"
                 onClick={() => navigate(`/notes/${note.id}`)}
-                className="flex-1 cursor-pointer text-left"
+                className="min-w-0 flex-1 cursor-pointer text-left"
               >
-                <span className="font-serif text-lg">{note.title}</span>
+                <span className="block truncate font-serif text-lg">{note.title}</span>
                 <span className="mt-0.5 block truncate text-sm text-ink-soft">
                   {plainText(note.content) || 'Empty note'}
                 </span>
               </button>
 
-              <span className="hidden text-xs tracking-wider text-ink-faint uppercase sm:inline">
+              <span className="hidden shrink-0 text-xs tracking-wider text-ink-faint uppercase sm:inline">
                 {dayFormat.format(new Date(note.updatedAt))}
               </span>
 
@@ -255,7 +281,7 @@ export function NotesPage() {
                 type="button"
                 onClick={() => void handleDelete(note)}
                 aria-label={`Delete ${note.title}`}
-                className="cursor-pointer rounded-full px-2 py-1 text-ink-faint opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:text-danger focus-visible:opacity-100"
+                className="shrink-0 cursor-pointer rounded-full px-2 py-1 text-ink-faint opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:text-danger focus-visible:opacity-100"
               >
                 &times;
               </button>
@@ -264,23 +290,12 @@ export function NotesPage() {
         </ul>
       ) : null}
 
-      {!loading && visible.length === 0 ? (
-        <div className="rounded-xs border border-dashed border-edge px-6 py-16 text-center">
-          <p className="font-serif text-xl">
-            {search ? `Nothing matches "${search}"` : 'Your notebook is empty'}
-          </p>
-          <p className="mt-1 mb-5 text-sm text-ink-soft">
-            {search ? 'Try a different word, or clear the search.' : 'Press n to start writing.'}
-          </p>
-
-          {search ? (
-            <Button onClick={() => setSearch('')}>Clear search</Button>
-          ) : (
-            <Button variant="primary" onClick={() => navigate('/notes/new')}>
-              Write your first note
-            </Button>
-          )}
-        </div>
+      {showEmpty ? (
+        <EmptyState
+          search={query}
+          onClear={() => setSearch('')}
+          onNew={() => navigate('/notes/new')}
+        />
       ) : null}
     </>
   );

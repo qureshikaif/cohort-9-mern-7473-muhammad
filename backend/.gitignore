@@ -11,3 +11,6 @@ coverage/
 
 # local test database credentials
 .env.test
+
+coverage
+.scannerwork

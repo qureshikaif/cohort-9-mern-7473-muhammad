@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   testEnvironment: 'jsdom',
   // without this jsdom hands jest the esm builds
@@ -11,6 +13,20 @@ module.exports = {
     // needs the ./ prefix, a bare 'config' also matches one inside testing-library
     '^\\./runtimeConfig$': '<rootDir>/test/configStub.ts',
   },
+  reporters: [
+    'default',
+    [
+      'jest-sonar',
+      {
+        outputDirectory: 'coverage',
+        outputName: 'test-report.xml',
+        // sonar runs from the repo root so the paths need the frontend/ prefix
+        relativeRootDir: path.resolve(__dirname, '..'),
+      },
+    ],
+  ],
+  coverageReporters: ['lcov', 'text-summary'],
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/main.tsx', '!src/**/*.d.ts'],
   transform: {
     '^.+\\.(ts|tsx|js|jsx)$': 'babel-jest',
   },

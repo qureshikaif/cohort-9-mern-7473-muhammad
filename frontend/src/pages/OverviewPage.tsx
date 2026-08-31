@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { listNotes } from '../lib/api';
+import { plainText } from '../lib/text';
 import type { Note } from '../lib/types';
 import { ActivityChart } from '../components/ActivityChart';
 import { TransferButtons } from '../components/TransferButtons';
@@ -9,13 +10,6 @@ import { Alert, Button, Spinner } from '../components/ui';
 const dayName = new Intl.DateTimeFormat(undefined, { weekday: 'narrow' });
 const fullDay = new Intl.DateTimeFormat(undefined, { weekday: 'long', day: 'numeric', month: 'short' });
 const shortDate = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' });
-
-function plainText(html: string): string {
-  return html
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 function words(note: Note): number {
   const text = plainText(note.content);
